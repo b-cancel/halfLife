@@ -10,6 +10,7 @@ class Medications{
   static int nextID;
   static File _excerciseFile;
 
+  /*
   //main struct we are maintaining (id -> excercise)
   //NOTE: we could use hashset but its slower than a map for deletion 
   //and accessing specific items
@@ -168,4 +169,5 @@ class Medications{
     string += "]";
     return string;
   }
+  */
 }

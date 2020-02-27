@@ -6,63 +6,56 @@ class AMedication{
   //NOTE: this is saved by the addExcercise function
   int id;
 
+  //medication name
   String _name;
   String get name => _name;
   set name(String newName){
     _name = newName;
-    Medications.updateFile();
-  }
-  
-  int _setTarget;
-  int get setTarget => _setTarget;
-  set setTarget(int newSetTarget){
-    _setTarget = newSetTarget;
-    Medications.updateFile();
+    //Medications.updateFile();
   }
 
-  //temp start time
-  DateTime _tempStartTime;
-  DateTime get tempStartTime => _tempStartTime;
-  set tempStartTime(DateTime newTempStartTime){
-    DateTime newValue = newTempStartTime;
-    _tempStartTime = newValue;
-    Medications.updateFile();
+  //last dose
+  DateTime _lastDoseDateTime;
+  DateTime get lastDoseDateTime => _lastDoseDateTime;
+  set lastDoseDateTime(DateTime newLastDoseDateTime){
+    _lastDoseDateTime = newLastDoseDateTime;
+    //Medications.updateFile();
+  }
+  
+  //half life
+  int _halfLife;
+  int get halfLife => _halfLife;
+  set halfLife(int newHalfLife){
+    _halfLife = newHalfLife;
+    //Medications.updateFile();
+  }
+
+  //highest dose
+  int _highestDose;
+  int get highestDose => _highestDose;
+  set highestDose(int newHighestDose){
+    _highestDose = newHighestDose;
+    //Medications.updateFile();
   }
 
   //build
   AMedication(
-    //basic data
     String name, 
-    String url, 
-    String note,
-
-    //other
-    int predictionID,
-    int repTarget,
-    Duration recoveryPeriod,
-    int setTarget,
-
-    //date time
-    DateTime lastTimeStamp,
+    DateTime lastDoseDateTime, 
+    int halfLife,
   ){
-    //variables that have notifiers 
-    //that are required to have atleast a default value
-    _tempStartTime = nullDateTime;
-
-    //required to pass variables
+    //TODO: add new ID
     _name = name;
-    _setTarget = setTarget;
-
-    //NOTE: the update to the file should only happen after everything else
-    this.lastTimeStamp = lastTimeStamp;
+    _lastDoseDateTime = lastDoseDateTime;
+    _halfLife = halfLife;
   }
 
   //NOTE: from here we MUST set things directly to the private variables
   AMedication.fromJson(Map<String,dynamic> map){
     id = map["id"];
     _name = map["name"];
-    _setTarget = map["setTarget"];
-    _tempStartTime = _stringToDateTime(map["tempStartTime"]);
+    _halfLife = map["halfLife"];
+    _lastDoseDateTime = _stringToDateTime(map["lastDoseDateTime"]);
   }
 
   DateTime _stringToDateTime(String json){
@@ -74,8 +67,8 @@ class AMedication{
     return {
       "id": id,
       "name": name,
-      "setTarget": setTarget,
-      "tempStartTime": _dateTimeToString(tempStartTime),
+      "halfLife": halfLife,
+      "lastDoseDateTime": _dateTimeToString(lastDoseDateTime),
     };
   }
 
