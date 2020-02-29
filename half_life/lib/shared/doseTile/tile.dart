@@ -140,7 +140,7 @@ class DoseTile extends StatelessWidget {
                       ),
                     ),
                     subtitle: Text(
-                      "On " + DateTimeFormat.format(
+                      "On " + DateTimeFormat.weekAndDay(
                         timeTaken,
                       ),
                     )

@@ -31,12 +31,17 @@ class DateTimeFormat{
     else return "th";
   }
   
-  //monday the 1st of december 2020
-  static String format(DateTime dateTime){
+  static String weekAndDay(DateTime dateTime){
     String weekStr = weekDayToString[dateTime.weekday];
     String dayStr = dateTime.day.toString();
     dayStr += daySuffix(dateTime.day);
-    String monthStr = monthToString[dateTime.month];
-    return weekStr + " the " + dayStr + " of " + monthStr;
+    return weekStr + " the " + dayStr;
+  }
+
+  //monday the 1st of december 2020
+  static String monthAndYear(DateTime dateTime){
+    String month = monthToString[dateTime.month];
+    String year = dateTime.year.toString();
+    return month + " of " + year;
   }
 }

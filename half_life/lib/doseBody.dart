@@ -1,8 +1,12 @@
+//flutter
 import 'package:flutter/material.dart';
-import 'package:half_life/doseRefresh.dart';
+
+//internal
 import 'package:half_life/shared/scrollToTop.dart';
 import 'package:half_life/struct/doses.dart';
+import 'package:half_life/doseRefresh.dart';
 
+//body
 class DosesBody extends StatefulWidget {
   DosesBody({
     @required this.doses,

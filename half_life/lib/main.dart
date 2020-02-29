@@ -15,6 +15,18 @@ class MyApp extends StatelessWidget {
 
     doses.add(
       Dose(
+        0,
+        DateTime(
+          2020,
+          1, //feb
+          20, //20
+          1, //1 am
+        ),
+      ),
+    );
+
+    doses.add(
+      Dose(
         100,
         DateTime(
           2020,
@@ -33,6 +45,18 @@ class MyApp extends StatelessWidget {
           2,
           28,
           4,
+        ),
+      ),
+    );
+
+    doses.add(
+      Dose(
+        0,
+        DateTime(
+          2020,
+          1, //feb
+          24, //20
+          6, //1 am
         ),
       ),
     );
