@@ -1,13 +1,10 @@
-//dart
-import 'dart:math' as math;
-
 //flutter
 import 'package:flutter/material.dart';
 
 //plugins
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:half_life/items.dart';
+import 'package:half_life/shared/doseTile/tile.dart';
 import 'package:half_life/shared/scrollToTop.dart';
 import 'package:half_life/shared/tileDivider.dart';
 import 'package:half_life/utils/durationFormat.dart';
@@ -188,7 +185,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    Color softHeader = Color(0xFF64ffda);
+    Color softHeaderColor = Color(0xFF64ffda);
 
     //grab heights and all
     double statusBarHeight = MediaQuery.of(context).padding.top;
@@ -198,7 +195,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     //build
     return Scaffold(
-      backgroundColor: softHeader,
+      backgroundColor: softHeaderColor,
       body: Stack(
         children: <Widget>[
           SmartRefresher(
@@ -209,7 +206,7 @@ class _MyHomePageState extends State<MyHomePage> {
             enablePullDown: true,
             header: WaterDropMaterialHeader(
               offset: bigSmall[0],
-              color: softHeader,
+              color: softHeaderColor,
               backgroundColor: Colors.black,
             ),
             controller: _refreshController,
@@ -219,7 +216,7 @@ class _MyHomePageState extends State<MyHomePage> {
               controller: scrollController,
               slivers: <Widget>[
                 SliverAppBar(
-                  backgroundColor: softHeader,
+                  backgroundColor: softHeaderColor,
                   //the top title (is basically the bottom AppBar)
                   //NOTE: leading to left of title
                   //NOTE: title in middle
@@ -331,126 +328,15 @@ class _MyHomePageState extends State<MyHomePage> {
                 SliverAnimatedList(
                   initialItemCount: doses.length,
                   itemBuilder: (BuildContext context, int index, anim) {
-                    bool isEven = index % 2 == 0;
-                    bool isFirst = index == 0;
-                    bool isLast = index == doses.length - 1;
                     DateTime timeTaken = doses[index].timeStamp;
-                    return Slidable(
-                      actionPane: SlidableDrawerActionPane(),
-                      actionExtentRatio: 0.25,
-                      actions: <Widget>[
-                        IconSlideAction(
-                            caption: 'Archive',
-                            color: Colors.blue,
-                            icon: Icons.archive,
-                            onTap: () {
-                              print("more");
-                            }),
-                        IconSlideAction(
-                            caption: 'Share',
-                            color: Colors.indigo,
-                            icon: Icons.share,
-                            onTap: () {
-                              print("more");
-                            }),
-                      ],
-                      secondaryActions: <Widget>[
-                        IconSlideAction(
-                            caption: 'More',
-                            color: Colors.black45,
-                            icon: Icons.more_horiz,
-                            onTap: () {
-                              print("more");
-                            }),
-                        IconSlideAction(
-                            caption: 'Delete',
-                            color: Colors.red,
-                            icon: Icons.delete,
-                            onTap: () {
-                              print("delete");
-                            }),
-                      ],
-                      child: Stack(
-                        children: <Widget>[
-                          Positioned.fill(
-                            child: Container(
-                              color: isLast
-                                  ? ThemeData.dark().scaffoldBackgroundColor
-                                  : softHeader,
-                            ),
-                          ),
-                          ClipRRect(
-                            borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(isFirst ? 24 : 0),
-                              topRight: Radius.circular(isFirst ? 24 : 0),
-                              bottomLeft: Radius.circular(isLast ? 24 : 0),
-                              bottomRight: Radius.circular(isLast ? 24 : 0),
-                            ),
-                            child: Container(
-                              color: Colors.white,
-                              child: Column(
-                                children: <Widget>[
-                                  ListTile(
-                                    leading: CircleAvatar(
-                                      backgroundColor: isEven
-                                          ? ThemeData.dark().cardColor
-                                          : ThemeData.dark().primaryColorLight,
-                                      child: Text(
-                                        doses[index].value.round().toString(),
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      foregroundColor: Colors.white,
-                                    ),
-                                    title: RichText(
-                                      text: TextSpan(
-                                        style: TextStyle(
-                                          color: ThemeData.dark()
-                                              .scaffoldBackgroundColor,
-                                        ),
-                                        children: [
-                                          TextSpan(
-                                            text: "Taken ",
-                                          ),
-                                          TextSpan(
-                                            text: DurationFormat.format(
-                                              lastDateTime.value
-                                                  .difference(timeTaken),
-                                              //settings
-                                              len: 2,
-                                              spaceBetween: true,
-                                              //no big quants
-                                              showYears: false,
-                                              showMonths: false,
-                                              showWeeks: false,
-                                              //yes medium quants
-                                              showDays: true,
-                                              showHours: true,
-                                              showMinutes: true,
-                                              //no little quants
-                                              showSeconds: false,
-                                              showMilliseconds: false,
-                                              showMicroseconds: false,
-                                            ),
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                          TextSpan(
-                                            text: " ago",
-                                          )
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                  ListTileDivider(),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                    return DoseTile(
+                      isFirst: index == 0, 
+                      isLast: index == doses.length - 1, 
+                      isEven: index % 2 == 0, 
+                      softHeaderColor: softHeaderColor, 
+                      dose: doses[index].value,
+                      timeTaken: timeTaken,
+                      timeSinceTaken: lastDateTime.value.difference(timeTaken),
                     );
                   },
                 ),
@@ -475,7 +361,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           ScrollToTopButton(
             onTop: onTop,
-            color: softHeader,
+            color: softHeaderColor,
             scrollController: scrollController,
           ),
         ],
