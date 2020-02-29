@@ -4,8 +4,12 @@ import 'dart:math' as math;
 /// Timeseries chart example
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:half_life/struct/doses.dart';
+
+/*
+double activeDose = 24; //calcActiveDose();
+    double maxDose = maxActiveDose - activeDose;
+*/
 
 //1 for pixelsBeforeNewPoint
 //is perfect curve but we may want to do less for performance
@@ -15,12 +19,14 @@ class HeaderChart extends StatefulWidget {
     this.pixelsBeforeNewPoint: 1,
     @required this.halfLife,
     @required this.doses,
+    @required this.lastDateTime,
   });
 
   final double screenWidth;
   final double pixelsBeforeNewPoint;
   final Duration halfLife;
   final List<Dose> doses;
+  final ValueNotifier<DateTime> lastDateTime;
 
   @override
   _HeaderChartState createState() => _HeaderChartState();
@@ -64,6 +70,12 @@ class _HeaderChartState extends State<HeaderChart> {
   List<charts.Series> seriesList;
   DateTime onHeaderLoad;
 
+  updateSeries(){
+    print("updated***************");
+    seriesList = fromDoses(dosePoints());
+    if(mounted) setState(() {});
+  }
+
   @override
   void initState() {
     //super init
@@ -71,6 +83,17 @@ class _HeaderChartState extends State<HeaderChart> {
 
     //dose point init
     seriesList = fromDoses(dosePoints());
+
+    //listen to date time changes
+    widget.lastDateTime.addListener(updateSeries);
+  }
+
+  @override
+  void dispose() {
+    widget.lastDateTime.removeListener(updateSeries);
+
+    //super dipose
+    super.dispose();
   }
 
   List<Dose> dosePoints(){
