@@ -203,7 +203,7 @@ class _DosesRefreshState extends State<DosesRefresh> {
         color: ThemeData.dark().scaffoldBackgroundColor,
         child: Center(
           child: Padding(
-            padding: const EdgeInsets.all(56.0),
+            padding: EdgeInsets.all(32.0),
             child: Icon(
               FontAwesomeIcons.prescriptionBottle,
               color: Colors.white,

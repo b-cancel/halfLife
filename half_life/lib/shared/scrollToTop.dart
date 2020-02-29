@@ -58,7 +58,7 @@ class _ScrollToTopButtonState extends State<ScrollToTopButton> {
           ),
           child: FloatingActionButton(
             heroTag: 'toTop',
-            backgroundColor: widget.color.withOpacity(0.75),
+            backgroundColor: widget.color,
             onPressed: (){
               widget.scrollController.jumpTo(0);
             },
