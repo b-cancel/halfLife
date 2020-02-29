@@ -27,28 +27,38 @@ class HeaderChart extends StatefulWidget {
 }
 
 class _HeaderChartState extends State<HeaderChart> {
-  num _sliderDomainValue;
-  String _sliderDragState;
-  math.Point<int> _sliderPosition;
+  // Listens to the underlying selection changes, and updates the information
+  // relevant to building the primitive legend like information under the
+  // chart.
+  onSelectionChanged(charts.SelectionModel model) {
+    final selectedDatum = model.selectedDatum;
+    if(selectedDatum.isNotEmpty){
+      print("DT: " + selectedDatum.first.datum.timeStamp.toString());
+    }
+    else print("EMPTY");
 
-  // Handles callbacks when the user drags the slider.
-  _onSliderChange(math.Point<int> point, dynamic domain, String roleId,
-      charts.SliderListenerDragState dragState) {
-    // Request a build.
-    void rebuild(_) {
-      print("point: " + point.toString());
-      print("domain: " + domain.toString());
-      print("drag state: " + dragState.toString());
-      /*
-      setState(() {
-        _sliderDomainValue = (domain * 10).round() / 10;
-        _sliderDragState = dragState.toString();
-        _sliderPosition = point;
+    /*
+    DateTime time;
+    final measures = <String, num>{};
+
+    // We get the model that updated with a list of [SeriesDatum] which is
+    // simply a pair of series & datum.
+    //
+    // Walk the selection updating the measures map, storing off the sales and
+    // series name for each selection point.
+    if (selectedDatum.isNotEmpty) {
+      time = selectedDatum.first.datum.time;
+      selectedDatum.forEach((charts.SeriesDatum datumPair) {
+        measures[datumPair.series.displayName] = datumPair.datum.sales;
       });
-      */
     }
 
-    SchedulerBinding.instance.addPostFrameCallback(rebuild);
+    // Request a build.
+    setState(() {
+      //_time = time;
+      //_measures = measures;
+    });
+    */
   }
 
   List<charts.Series> seriesList;
@@ -122,14 +132,45 @@ class _HeaderChartState extends State<HeaderChart> {
 
   @override
   Widget build(BuildContext context) {
+    double pointSize = 8;
     return charts.TimeSeriesChart(
       seriesList,
       animate: true,
+      //reads the informatio of the point we are currently viewing
+      selectionModels: [
+        new charts.SelectionModelConfig(
+          //change in selection
+          changedListener: onSelectionChanged,
+          //anytime update selection
+          //updatedListener: onSelectionChanged,
+        )
+      ],
       behaviors: [
-        charts.Slider(
-          initialDomainValue: onHeaderLoad, 
-          onChangeCallback: _onSliderChange,
+        //show lines on selection X and Y axis
+        charts.LinePointHighlighter(
+          //what to show
+          showHorizontalFollowLine: charts.LinePointHighlighterFollowLineType.all,
+          showVerticalFollowLine: charts.LinePointHighlighterFollowLineType.all,
+          //how to show it
+          defaultRadiusPx: pointSize,
+          radiusPaddingPx: 0,
+          //make lines solid
+          dashPattern: [],
+          //we only need to see how it links up to the current axises
+          //but its more obvious that something happened if its true
+          drawFollowLinesAcrossChart: true,
+          //render of points
+          symbolRenderer: charts.CircleSymbolRenderer(
+            isSolid: true,
+          ),
         ),
+        //allow tap and drag (instead of just tap)
+        charts.SelectNearest(
+          eventTrigger: charts.SelectionTrigger.tapAndDrag,
+          //all the points that match this result are not needed in selection
+          expandToDomain: false,
+        )
+
       ],
       /*
       // Optionally turn off the animation that animates values up from the
