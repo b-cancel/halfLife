@@ -13,6 +13,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     List<Dose> doses = new List<Dose>();
 
+/*
     doses.add(
       Dose(
         0,
@@ -24,6 +25,7 @@ class MyApp extends StatelessWidget {
         ),
       ),
     );
+    */
 
     doses.add(
       Dose(
@@ -49,6 +51,7 @@ class MyApp extends StatelessWidget {
       ),
     );
 
+/*
     doses.add(
       Dose(
         0,
@@ -60,6 +63,106 @@ class MyApp extends StatelessWidget {
         ),
       ),
     );
+    */
+
+    doses.add(
+      Dose(
+        0,
+        DateTime(
+          2020,
+          1, //feb
+          24, //20
+          22, //1 am
+        ),
+      ),
+    );
+
+    doses.add(
+      Dose(
+        0,
+        DateTime(
+          2020,
+          1, //feb
+          24, //20
+          19, //1 am
+        ),
+      ),
+    );
+
+    doses.add(
+      Dose(
+        0,
+        DateTime(
+          2020,
+          1, //feb
+          24, //20
+          16, //1 am
+        ),
+      ),
+    );
+
+    doses.add(
+      Dose(
+        0,
+        DateTime(
+          2020,
+          1, //feb
+          24, //20
+          13, //1 am
+        ),
+      ),
+    );
+
+    doses.add(
+      Dose(
+        0,
+        DateTime(
+          2020,
+          1, //feb
+          24, //20
+          10, //1 am
+        ),
+      ),
+    );
+
+    doses.add(
+      Dose(
+        0,
+        DateTime(
+          2020,
+          1, //feb
+          24, //20
+          7, //1 am
+        ),
+      ),
+    );
+
+
+    doses.add(
+      Dose(
+        0,
+        DateTime(
+          2020,
+          1, //feb
+          24, //20
+          4, //1 am
+        ),
+      ),
+    );
+
+    doses.add(
+      Dose(
+        0,
+        DateTime(
+          2020,
+          1, //feb
+          24, //20
+          1, //1 am
+        ),
+      ),
+    );
+    
+
 
     doses.add(
       Dose(
