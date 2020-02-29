@@ -35,26 +35,16 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  DateTime now;
   Duration halfLife = Duration(hours: 36);
   List<Dose> doses = new List<Dose>();
   int maxActiveDose = 40;
 
   @override
   void initState() {
-    now = DateTime.now();
-
     doses.add(Dose(100, DateTime(
       2020,
       2, //feb
       20, //20
-      1 //1 am
-    )));
-
-    doses.add(Dose(50, DateTime(
-      2020,
-      2, //feb
-      21, //21
       1 //1 am
     )));
 
@@ -64,6 +54,15 @@ class _MyHomePageState extends State<MyHomePage> {
       28,
       4,
     )));
+
+    doses.add(Dose(50, DateTime(
+      2020,
+      2, //feb
+      21, //21
+      1 //1 am
+    )));
+
+    
 
     super.initState();
   }
@@ -75,8 +74,16 @@ class _MyHomePageState extends State<MyHomePage> {
   DateTime lastDateTime;
 
   calcActiveDose(){
+    //sort our doses to our first dose is our first dose
+    doses.sort((a, b) => b.compareTo(a));
+
+    //grab our first dose
     firstDose = doses[0].timeStamp;
+
+    //determine how much time has passed since our first dose
     Duration timeSinceFirst = DateTime.now().difference(firstDose);
+
+    ///calculate the stuff we are showing the user
     elapsedTime = Duration(
       microseconds: (timeSinceFirst.inMicroseconds * sliderValue).round(),
     );
@@ -92,7 +99,7 @@ class _MyHomePageState extends State<MyHomePage> {
       if(doseBefore || doseAt){
         dosesBeingConsidered++;
 
-        int dose = doses[i].value;
+        double dose = doses[i].value;
         DateTime timeTaken = doses[i].timeStamp;
         Duration timeSinceTaken = lastDateTime.difference(timeTaken);
 
@@ -111,6 +118,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    Color softHeader = Color(0xFF64ffda);
+
+    print("will calc active dose");
     double activeDose = calcActiveDose();
     double maxDose = maxActiveDose - activeDose;
     
@@ -123,7 +133,7 @@ class _MyHomePageState extends State<MyHomePage> {
       body: CustomScrollView(
         slivers: <Widget>[
           SliverAppBar(
-            backgroundColor: Color(0xFFA8E6CF),
+            backgroundColor: softHeader,
             //the top title (is basically the bottom AppBar)
             //NOTE: leading to left of title
             //NOTE: title in middle
@@ -203,6 +213,8 @@ class _MyHomePageState extends State<MyHomePage> {
                       bottom: bottomBarHeight,
                     ),
                     child: HeaderChart(
+                      screenWidth: MediaQuery.of(context).size.width,
+                      halfLife: halfLife,
                       doses: doses,
                     ),
                   ),
