@@ -177,7 +177,6 @@ class _DosesRefreshState extends State<DosesRefresh> {
             screenWidth: MediaQuery.of(context).size.width,
             halfLife: widget.halfLife,
             doses: widget.doses,
-            scrollEnabled: scrollEnabled,
           ),
         ),
       ),
@@ -221,29 +220,6 @@ class _DosesRefreshState extends State<DosesRefresh> {
     slivers.add(fillRemainingSliver);
   }
 
-  //enables and disables physics
-  final ValueNotifier<bool> scrollEnabled = new ValueNotifier<bool>(true);
-
-  //function to update scroll
-  updateState(){
-    if(mounted){
-      setState(() {});
-    }
-  }
-
-  //init
-  @override
-  void initState() { 
-    super.initState();
-    scrollEnabled.addListener(updateState);
-  }
-
-  @override
-  void dispose() { 
-    scrollEnabled.removeListener(updateState);
-    super.dispose();
-  }
-
   //build
   @override
   Widget build(BuildContext context) {
@@ -253,7 +229,7 @@ class _DosesRefreshState extends State<DosesRefresh> {
 
     //build
     return SmartRefresher(
-      physics: scrollEnabled.value ? null : NeverScrollableScrollPhysics(),
+      physics: BouncingScrollPhysics(),
       scrollController: widget.scrollController,
       //no footer animation
       enablePullUp: false,
@@ -280,7 +256,7 @@ class _DosesRefreshState extends State<DosesRefresh> {
         refreshController.loadComplete();
       },
       child: CustomScrollView(
-        physics: scrollEnabled.value ? null : NeverScrollableScrollPhysics(),
+        physics: BouncingScrollPhysics(),
         controller: widget.scrollController,
         slivers: slivers,
       ),

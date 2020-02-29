@@ -25,7 +25,6 @@ class HeaderChart extends StatefulWidget {
     @required this.halfLife,
     @required this.doses,
     @required this.lastDateTime,
-    @required this.scrollEnabled,
   });
 
   final double screenWidth;
@@ -33,7 +32,6 @@ class HeaderChart extends StatefulWidget {
   final Duration halfLife;
   final List<Dose> doses;
   final ValueNotifier<DateTime> lastDateTime;
-  final ValueNotifier<bool> scrollEnabled;
 
   @override
   _HeaderChartState createState() => _HeaderChartState();

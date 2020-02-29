@@ -9,6 +9,8 @@ import 'package:half_life/doseBody.dart';
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
+  static Color softHeaderColor = Color(0xFF64ffda);
+
   @override
   Widget build(BuildContext context) {
     List<Dose> doses = new List<Dose>();
@@ -178,6 +180,9 @@ class MyApp extends StatelessWidget {
 
     return MaterialApp(
       title: 'Half Life',
+      theme: ThemeData.light().copyWith(
+        accentColor: softHeaderColor,
+      ),
       home: DosesBody(
         halfLife: Duration(hours: 36),
         doses: doses,

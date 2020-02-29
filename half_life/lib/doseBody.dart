@@ -1,5 +1,6 @@
 //flutter
 import 'package:flutter/material.dart';
+import 'package:half_life/main.dart';
 
 //internal
 import 'package:half_life/shared/scrollToTop.dart';
@@ -59,23 +60,18 @@ class _DosesBodyState extends State<DosesBody> {
 
   @override
   Widget build(BuildContext context) {
-    //soft green or blue used throughout
-    Color softHeaderColor = Color(0xFF64ffda);
-
-    //build
     return Scaffold(
-      backgroundColor: softHeaderColor,
       body: Stack(
         children: <Widget>[
           DosesRefresh(
-            softHeaderColor: softHeaderColor,
+            softHeaderColor: MyApp.softHeaderColor,
             scrollController: scrollController,
             halfLife: widget.halfLife,
             doses: widget.doses,
           ),
           ScrollToTopButton(
             onTop: onTop,
-            color: softHeaderColor,
+            color: MyApp.softHeaderColor,
             scrollController: scrollController,
           ),
         ],
