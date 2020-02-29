@@ -1,5 +1,6 @@
 //flutter
 import 'package:flutter/material.dart';
+import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 
 //plugin
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -43,13 +44,17 @@ class _DosesRefreshState extends State<DosesRefresh> {
     initialRefresh: true,
   );
 
+  //everything updated at once
   updateDateTime() {
     lastDateTime.value = DateTime.now();
+    updateSlivers();
     if (mounted) setState(() {});
   }
 
-  @override
-  Widget build(BuildContext context) {
+  //update before settings state
+  double chartHeight;
+  List<Widget> slivers;
+  updateSlivers(){
     //the doses that we just took go on top
     widget.doses.sort((a, b) => a.compareTo(b));
 
@@ -87,7 +92,7 @@ class _DosesRefreshState extends State<DosesRefresh> {
     double statusBarHeight = MediaQuery.of(context).padding.top;
     double bottomBarHeight = 36;
     double screenHeight = MediaQuery.of(context).size.height;
-    List<double> bigSmall = measurementToGoldenRatioBS(screenHeight);
+    chartHeight = measurementToGoldenRatioBS(screenHeight)[0];
 
     //create app bar
     Widget sliverAppBar = SliverAppBar(
@@ -136,7 +141,7 @@ class _DosesRefreshState extends State<DosesRefresh> {
         ),
       ),
       //most of the screen
-      expandedHeight: bigSmall[0],
+      expandedHeight: chartHeight,
       //the graph
       flexibleSpace: FlexibleSpaceBar(
         //scaling title
@@ -161,7 +166,7 @@ class _DosesRefreshState extends State<DosesRefresh> {
         ],
         //the background with the graph and active dose
         background: Container(
-          height: bigSmall[0],
+          height: chartHeight,
           width: MediaQuery.of(context).size.width,
           padding: EdgeInsets.only(
             top: statusBarHeight,
@@ -172,6 +177,7 @@ class _DosesRefreshState extends State<DosesRefresh> {
             screenWidth: MediaQuery.of(context).size.width,
             halfLife: widget.halfLife,
             doses: widget.doses,
+            scrollEnabled: scrollEnabled,
           ),
         ),
       ),
@@ -191,13 +197,13 @@ class _DosesRefreshState extends State<DosesRefresh> {
 
     //fill space
     Widget fillRemainingSliver = SliverFillRemaining(
-      hasScrollBody: true, //it should be as small as possible
-      fillOverscroll: false, //only if above is false
+      hasScrollBody: false, //it should be as small as possible
+      fillOverscroll: true, //only if above is false
       child: Container(
         color: ThemeData.dark().scaffoldBackgroundColor,
         child: Center(
           child: Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(56.0),
             child: Icon(
               FontAwesomeIcons.prescriptionBottle,
               color: Colors.white,
@@ -208,20 +214,53 @@ class _DosesRefreshState extends State<DosesRefresh> {
     );
 
     //add slivers one by one
-    List<Widget> slivers = new List<Widget>();
+    slivers?.clear();
+    slivers = new List<Widget>();
     slivers.add(sliverAppBar);
     slivers.addAll(groups);
     slivers.add(fillRemainingSliver);
+  }
 
-    //refreshable body
+  //enables and disables physics
+  final ValueNotifier<bool> scrollEnabled = new ValueNotifier<bool>(true);
+
+  //function to update scroll
+  updateState(){
+    if(mounted){
+      setState(() {});
+    }
+  }
+
+  //init
+  @override
+  void initState() { 
+    super.initState();
+    scrollEnabled.addListener(updateState);
+  }
+
+  @override
+  void dispose() { 
+    scrollEnabled.removeListener(updateState);
+    super.dispose();
+  }
+
+  //build
+  @override
+  Widget build(BuildContext context) {
+    if(slivers == null){
+      updateSlivers();
+    }
+
+    //build
     return SmartRefresher(
+      physics: scrollEnabled.value ? null : NeverScrollableScrollPhysics(),
       scrollController: widget.scrollController,
       //no footer animation
       enablePullUp: false,
       //yes header animation
       enablePullDown: true,
       header: WaterDropMaterialHeader(
-        offset: bigSmall[0],
+        offset: chartHeight,
         color: ThemeData.dark().scaffoldBackgroundColor,
         backgroundColor: widget.softHeaderColor,
       ),
@@ -241,6 +280,7 @@ class _DosesRefreshState extends State<DosesRefresh> {
         refreshController.loadComplete();
       },
       child: CustomScrollView(
+        physics: scrollEnabled.value ? null : NeverScrollableScrollPhysics(),
         controller: widget.scrollController,
         slivers: slivers,
       ),

@@ -5,6 +5,7 @@ import 'dart:math' as math;
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:flutter/material.dart';
 import 'package:half_life/shared/conditional.dart';
+import 'package:half_life/shared/doseTile/tile.dart';
 import 'package:half_life/struct/doses.dart';
 import 'package:half_life/utils/dateTimeFormat.dart';
 import 'package:half_life/utils/durationFormat.dart';
@@ -20,10 +21,11 @@ double activeDose = 24; //calcActiveDose();
 class HeaderChart extends StatefulWidget {
   HeaderChart({
     @required this.screenWidth,
-    this.pixelsBeforeNewPoint: 1,
+    this.pixelsBeforeNewPoint: 4,
     @required this.halfLife,
     @required this.doses,
     @required this.lastDateTime,
+    @required this.scrollEnabled,
   });
 
   final double screenWidth;
@@ -31,6 +33,7 @@ class HeaderChart extends StatefulWidget {
   final Duration halfLife;
   final List<Dose> doses;
   final ValueNotifier<DateTime> lastDateTime;
+  final ValueNotifier<bool> scrollEnabled;
 
   @override
   _HeaderChartState createState() => _HeaderChartState();
@@ -146,6 +149,7 @@ class _HeaderChartState extends State<HeaderChart> {
     double pointSize = 8;
     return Stack(
       children: <Widget>[
+        
         charts.TimeSeriesChart(
           seriesList,
           animate: true,
@@ -240,34 +244,27 @@ class _HeaderChartState extends State<HeaderChart> {
           */
         ),
         Positioned.fill(
-          child: Column(
-            mainAxisSize: MainAxisSize.max,
-            children: <Widget>[
-              Flexible(
-                flex: smallNumber,
-                child: Column(
-                  children: [
-                    Flexible(
-                      flex: largeNumber,
-                      child: Container(),
-                    ),
-                    ActiveDosageDisplay(
-                      lastDateTime: widget.lastDateTime,
-                      selectedDateTime: selectedDateTime,
-                      selectedActiveDosage: selectedActiveDosage,
-                    ),
-                    Flexible(
-                      flex: smallNumber,
-                      child: Container(),
-                    ),
-                  ]
-                )
-              ),
-              Flexible(
-                flex: largeNumber,
-                child: Container(),
-              ),
-            ],
+          child: IgnorePointer(
+            child: Column(
+              mainAxisSize: MainAxisSize.max,
+              children: <Widget>[
+                Flexible(
+                  flex: smallNumber,
+                  child: Container(color: Colors.transparent),
+                ),
+                IgnorePointer(
+                  child: ActiveDosageDisplay(
+                    lastDateTime: widget.lastDateTime,
+                    selectedDateTime: selectedDateTime,
+                    selectedActiveDosage: selectedActiveDosage,
+                  ),
+                ),
+                Flexible(
+                  flex: largeNumber,
+                  child: Container(color: Colors.transparent),
+                ),
+              ],
+            ),
           ),
         ),
       ],
@@ -386,7 +383,15 @@ class _ActiveDosageDisplayState extends State<ActiveDosageDisplay> {
               ],
             ),
           ),
-        )
+        ),
+        Padding(
+          padding: EdgeInsets.only(
+            top: 4.0,
+          ),
+          child: ToTimeOfDay(
+            timeStamp: widget.selectedDateTime.value,
+          ),
+        ),
       ],
     );
   }

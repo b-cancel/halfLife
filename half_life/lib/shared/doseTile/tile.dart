@@ -237,7 +237,7 @@ class ToTimeOfDay extends StatelessWidget {
               shiftLeft == null ? 0 : (
                 shiftLeft ? -8 : 8
               ), 
-              shiftLeft == null ? -12 : -6,
+              shiftLeft == null ? -8 : -4,
             ),
             child: Icon(
               WeatherIcons.wi_day_sunny,

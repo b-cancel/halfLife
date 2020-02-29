@@ -61,7 +61,7 @@ class GroupHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Color backgroundColor = ThemeData.dark().scaffoldBackgroundColor;
+    Color backgroundColor = ThemeData.dark().primaryColorDark;
 
     //build
     return Stack(
