@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:half_life/shared/tileDivider.dart';
-import 'package:half_life/struct/doses.dart';
 import 'package:half_life/utils/dateTimeFormat.dart';
 import 'package:half_life/utils/durationFormat.dart';
 
@@ -25,8 +24,7 @@ class DoseTile extends StatelessWidget {
   final bool isLast;
   final bool isEven;
   final Color softHeaderColor;
-  
-  
+
   final double dose;
   final DateTime timeTaken;
   final Duration timeSinceTaken;
@@ -89,23 +87,19 @@ class DoseTile extends StatelessWidget {
               child: Column(
                 children: <Widget>[
                   ListTile(
-                    leading: CircleAvatar(
-                      backgroundColor: isEven
-                          ? ThemeData.dark().cardColor
-                          : ThemeData.dark().primaryColorLight,
-                      child: Text(
-                        dose.round().toString(),
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
+                    leading: Theme(
+                      data: Theme.of(context).copyWith(
+                          iconTheme: IconThemeData(
+                        color: ThemeData.dark().scaffoldBackgroundColor,
+                      )),
+                      child: ToTimeOfDay(
+                        timeStamp: timeTaken,
                       ),
-                      foregroundColor: Colors.white,
                     ),
                     title: RichText(
                       text: TextSpan(
                         style: TextStyle(
-                          color: ThemeData.dark()
-                              .scaffoldBackgroundColor,
+                          color: ThemeData.dark().scaffoldBackgroundColor,
                         ),
                         children: [
                           TextSpan(
@@ -141,20 +135,17 @@ class DoseTile extends StatelessWidget {
                       ),
                     ),
                     subtitle: Text(
-                      "On " + DateTimeFormat.weekAndDay(
-                        timeTaken,
+                      "On " +
+                          DateTimeFormat.weekAndDay(
+                            timeTaken,
+                          ),
+                    ),
+                    trailing: Text(
+                      dose.round().toString(),
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                    trailing: Theme(
-                      data: Theme.of(context).copyWith(
-                        iconTheme: IconThemeData(
-                          color: ThemeData.dark().scaffoldBackgroundColor,
-                        )
-                      ),
-                      child: ToTimeOfDay(
-                        timeStamp: timeTaken,
-                      ),
-                    )
                   ),
                   Visibility(
                     visible: isLast == false,
@@ -173,9 +164,11 @@ class DoseTile extends StatelessWidget {
 class ToTimeOfDay extends StatelessWidget {
   ToTimeOfDay({
     @required this.timeStamp,
+    this.addBack: true,
   });
 
   final DateTime timeStamp;
+  final bool addBack;
 
   @override
   Widget build(BuildContext context) {
@@ -184,29 +177,37 @@ class ToTimeOfDay extends StatelessWidget {
 
     //mapping begin
     Widget icon;
-    if(hour < 2){ //2 am
+    if (hour < 2) {
+      //2 am
       icon = Icon(
         FontAwesome.moon_o,
       );
-    }
-    else if(hour < 5){ //5 am
-      icon = Icon(
-        WeatherIcons.wi_moonset,
+    } else if (hour < 5) {
+      //5 am
+      icon = Transform.translate(
+        offset: Offset(1, -4),
+        child: Icon(
+          WeatherIcons.wi_moonset,
+          color: Colors.white,
+        ),
       );
-    } 
-    else if(hour < 8){
-      icon = Icon(
-        WeatherIcons.wi_sunrise,
+    } else if (hour < 8) {
+      icon = Transform.translate(
+        offset: Offset(-3, -2),
+        child: Icon(
+          WeatherIcons.wi_sunrise,
+        ),
       );
-    }
-    else if(hour < 17){ //same icon but shifted
+    } else if (hour < 17) {
+      //same icon but shifted
       //shift when needed
       bool shiftLeft;
-      if(hour < 11){ //shift right
+      if (hour < 11) {
+        //shift right
         shiftLeft = false;
-      }
-      else if(hour < 14){}
-      else{ //shift left
+      } else if (hour < 14) {
+      } else {
+        //shift left
         shiftLeft = true;
       }
 
@@ -224,7 +225,7 @@ class ToTimeOfDay extends StatelessWidget {
               ),
               child: Container(
                 height: 2,
-                color: ThemeData.dark().scaffoldBackgroundColor,
+                color: Colors.white,
               ),
             ),
           ),
@@ -234,10 +235,8 @@ class ToTimeOfDay extends StatelessWidget {
           ),
           Transform.translate(
             offset: Offset(
-              shiftLeft == null ? 0 : (
-                shiftLeft ? -8 : 8
-              ), 
-              shiftLeft == null ? -8 : -4,
+              shiftLeft == null ? 0 : (shiftLeft ? -6 : 6),
+              shiftLeft == null ? -8 : -6,
             ),
             child: Icon(
               WeatherIcons.wi_day_sunny,
@@ -246,21 +245,59 @@ class ToTimeOfDay extends StatelessWidget {
           ),
         ],
       );
-    }
-    else if(hour < 20){
-      icon = Icon(
-        WeatherIcons.wi_sunset,
+    } else if (hour < 20) {
+      icon = Transform.translate(
+        offset: Offset(-3, -2),
+        child: Icon(
+          WeatherIcons.wi_sunset,
+        ),
       );
-    }
-    else if(hour < 23){
-      icon = Icon(
-        WeatherIcons.wi_moonrise,
+    } else if (hour < 23) {
+      icon = Transform.translate(
+        offset: Offset(1, -4),
+        child: Icon(
+          WeatherIcons.wi_moonrise,
+        ),
       );
-    }
-    else{
+    } else {
       icon = Icon(
         FontAwesome.moon_o,
       );
+    }
+
+    //add proper background color
+    if (addBack) {
+      if (hour < 5) {
+        icon = CircleAvatar(
+          backgroundColor: ThemeData.dark().scaffoldBackgroundColor,
+          foregroundColor: Colors.white,
+          child: icon,
+        );
+      } else if (hour < 8) {
+        icon = CircleAvatar(
+          backgroundColor: Color(0xFFffb347), //orange
+          foregroundColor: ThemeData.dark().scaffoldBackgroundColor,
+          child: icon,
+        );
+      } else if (hour < 17) {
+        icon = CircleAvatar(
+          backgroundColor: Color(0xFF4793ff), //blue
+          foregroundColor: Colors.white,
+          child: icon,
+        );
+      } else if (hour < 20) {
+        icon = CircleAvatar(
+          backgroundColor: Color(0xFFffb347), //orange
+          foregroundColor: ThemeData.dark().scaffoldBackgroundColor,
+          child: icon,
+        );
+      } else {
+        icon = CircleAvatar(
+          backgroundColor: ThemeData.dark().scaffoldBackgroundColor,
+          foregroundColor: Colors.white,
+          child: icon,
+        );
+      }
     }
 
     //return icon
