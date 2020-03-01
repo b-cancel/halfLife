@@ -10,12 +10,14 @@ import 'package:scroll_to_index/scroll_to_index.dart';
 class DoseGroup extends StatelessWidget {
   DoseGroup({
     @required this.group,
+    @required this.lastGroup,
     @required this.lastDateTime,
     @required this.theSelectedDateTime,
     @required this.autoScrollController,
   });
 
   final List<Dose> group;
+  final bool lastGroup;
   final ValueNotifier<DateTime> lastDateTime;
   final ValueNotifier<DateTime> theSelectedDateTime;
   final AutoScrollController autoScrollController;
@@ -37,17 +39,39 @@ class DoseGroup extends StatelessWidget {
         initialItemCount: group.length,
         itemBuilder: (BuildContext context, int index, anim) {
           DateTime timeTaken = group[index].timeStamp;
-          return DoseTile(
-            id: group[index].id,
-            isFirst: index == 0,
-            isLast: index == group.length - 1,
-            isEven: index % 2 == 0,
-            softHeaderColor: Theme.of(context).accentColor,
-            dose: group[index].value,
-            timeTaken: timeTaken,
-            timeSinceTaken: lastDateTime.value.difference(timeTaken),
-            theSelectedDateTime: theSelectedDateTime,
-            autoScrollController: autoScrollController,
+          return Stack(
+            children: <Widget>[
+              //for absolute last group
+              //the corner that are uncovered should match the filler sliver
+              Positioned.fill(
+                child: Column(
+                  children: [
+                    //the top part of perhaps just ONE doseage
+                    Expanded(child: Container()),
+                    Expanded(
+                      child: Container(
+                        color: lastGroup 
+                        ? ThemeData.dark().scaffoldBackgroundColor 
+                        : Colors.transparent,
+                      )
+                    )
+                  ]
+                ),
+              ),
+              //the tile
+              DoseTile(
+                id: group[index].id,
+                isFirst: index == 0,
+                isLast: index == group.length - 1,
+                isEven: index % 2 == 0,
+                softHeaderColor: Theme.of(context).accentColor,
+                dose: group[index].value,
+                timeTaken: timeTaken,
+                timeSinceTaken: lastDateTime.value.difference(timeTaken),
+                theSelectedDateTime: theSelectedDateTime,
+                autoScrollController: autoScrollController,
+              ),
+            ],
           );
         },
       ),
@@ -132,56 +156,3 @@ class GroupHeader extends StatelessWidget {
     );
   }
 }
-
-
-      /*
-      SliverList(
-      delegate: new SliverChildListDelegate([
-        Stack(
-          children: <Widget>[
-            Positioned.fill(
-              child: Column(
-                mainAxisSize: MainAxisSize.max,
-                children: <Widget>[
-                  Expanded(
-                    child: Container(
-                      color: topColor,
-                      child: Container(),
-                    ),
-                  ),
-                  Expanded(
-                    child: Container(
-                      color: bottomColor,
-                      child: Container(),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Card(
-              margin: EdgeInsets.all(0),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(24.0),
-              ),
-              clipBehavior: Clip.antiAlias,
-              child: ListView.separated(
-                shrinkWrap: true,
-                physics: ClampingScrollPhysics(),
-                itemCount: thisGroup.length,
-                //ONLY false IF Hidden Section
-                reverse: (sectionType != TimeStampType.Hidden),
-                itemBuilder: (context, index){
-                  AnExcercise excercise = thisGroup[index];
-                  return ExcerciseTile(
-                    key: ValueKey(excercise.id),
-                    excercise: excercise,
-                  );
-                },
-                separatorBuilder : (context, index) => ListTileDivider(),
-              ),
-            ),
-          ],
-        ),
-      ]),
-    )
-      */

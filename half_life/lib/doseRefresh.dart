@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 
 //plugin
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -61,7 +62,7 @@ class _DosesRefreshState extends State<DosesRefresh> {
   //everything updated at once
   updateDateTime() {
     lastDateTime.value = DateTime.now();
-    updateSlivers();
+    updateGroups();
     if (mounted) setState(() {});
   }
 
@@ -70,9 +71,64 @@ class _DosesRefreshState extends State<DosesRefresh> {
   //build
   @override
   Widget build(BuildContext context) {
-    if (slivers == null) {
-      updateSlivers();
+    if (doseGroups == null) {
+      updateGroups();
     }
+
+    //grab heights and all
+    double statusBarHeight = MediaQuery.of(context).padding.top;
+    double bottomBarHeight = 36;
+    double screenHeight = MediaQuery.of(context).size.height;
+    chartHeight = measurementToGoldenRatioBS(screenHeight)[0];
+
+    //create app bar
+    Widget sliverAppBar = HeaderSliver(
+      theSelectedDateTime: theSelectedDateTime,
+      bottomBarHeight: bottomBarHeight, 
+      chartHeight: chartHeight, 
+      statusBarHeight: statusBarHeight, 
+      lastDateTime: lastDateTime, 
+      doses: widget.doses,
+      halfLife: widget.halfLife,
+    );
+
+    //generate group widgets
+    List<Widget> groups = new List<Widget>();
+    for (int i = 0; i < doseGroups.length; i++) {
+      groups.add(
+        DoseGroup(
+          group: doseGroups[i],
+          lastGroup: i == (doseGroups.length - 1),
+          theSelectedDateTime: theSelectedDateTime,
+          lastDateTime: lastDateTime,
+          autoScrollController: widget.autoScrollController,
+        ),
+      );
+    }
+
+    //fill space
+    Widget fillRemainingSliver = SliverFillRemaining(
+      hasScrollBody: false, //it should be as small as possible
+      fillOverscroll: true, //only if above is false
+      child: Container(
+        color: ThemeData.dark().scaffoldBackgroundColor,
+        child: Center(
+          child: Padding(
+            padding: EdgeInsets.all(32.0),
+            child: Icon(
+              FontAwesomeIcons.prescriptionBottle,
+              color: Colors.white,
+            ),
+          ),
+        ),
+      ),
+    );
+
+    //sliver
+    List<Widget> slivers = new List<Widget>();
+    slivers.add(sliverAppBar);
+    slivers.addAll(groups);
+    slivers.add(fillRemainingSliver);
 
     //build
     return SmartRefresher(
@@ -102,10 +158,14 @@ class _DosesRefreshState extends State<DosesRefresh> {
         // if failed,use loadFailed(),if no data return,use LoadNodata()
         refreshController.loadComplete();
       },
-      child: CustomScrollView(
-        physics: BouncingScrollPhysics(),
-        controller: widget.autoScrollController,
-        slivers: slivers,
+      child: Container(
+        //match section headers
+        color: ThemeData.dark().primaryColorDark,
+        child: CustomScrollView(
+          physics: BouncingScrollPhysics(),
+          controller: widget.autoScrollController,
+          slivers: slivers,
+        ),
       ),
     );
   }
@@ -113,14 +173,17 @@ class _DosesRefreshState extends State<DosesRefresh> {
   //update before settings state
   //seperated from build to stop unecesary reloads
   double chartHeight;
-  List<Widget> slivers;
-  updateSlivers() {
-    //the doses that we just took go on top
-    widget.doses.sort((a, b) => a.compareTo(b));
-
+  List<List<Dose>> doseGroups;
+  updateGroups() {
     //group doses into months (so we don't have to repeat it)
     //place month and year on sliver header
-    List<List<Dose>> doseGroups = new List<List<Dose>>();
+    if(doseGroups == null){
+      doseGroups = new List<List<Dose>>();
+    }
+    else doseGroups.clear();
+
+    //the doses that we just took go on top
+    widget.doses.sort((a, b) => a.compareTo(b));
 
     //NOTE: must use month AND year to be safe
     int doseMonth = -1;
@@ -147,60 +210,5 @@ class _DosesRefreshState extends State<DosesRefresh> {
       //add dose to last group
       doseGroups.last.add(thisDose);
     }
-
-    //grab heights and all
-    double statusBarHeight = MediaQuery.of(context).padding.top;
-    double bottomBarHeight = 36;
-    double screenHeight = MediaQuery.of(context).size.height;
-    chartHeight = measurementToGoldenRatioBS(screenHeight)[0];
-
-    //create app bar
-    Widget sliverAppBar = HeaderSliver(
-      theSelectedDateTime: theSelectedDateTime,
-      bottomBarHeight: bottomBarHeight, 
-      chartHeight: chartHeight, 
-      statusBarHeight: statusBarHeight, 
-      lastDateTime: lastDateTime, 
-      doses: widget.doses,
-      halfLife: widget.halfLife,
-    );
-
-    //generate group widgets
-    List<Widget> groups = new List<Widget>();
-    for (int i = 0; i < doseGroups.length; i++) {
-      groups.add(
-        DoseGroup(
-          group: doseGroups[i],
-          theSelectedDateTime: theSelectedDateTime,
-          lastDateTime: lastDateTime,
-          autoScrollController: widget.autoScrollController,
-        ),
-      );
-    }
-
-    //fill space
-    Widget fillRemainingSliver = SliverFillRemaining(
-      hasScrollBody: false, //it should be as small as possible
-      fillOverscroll: true, //only if above is false
-      child: Container(
-        color: ThemeData.dark().scaffoldBackgroundColor,
-        child: Center(
-          child: Padding(
-            padding: EdgeInsets.all(32.0),
-            child: Icon(
-              FontAwesomeIcons.prescriptionBottle,
-              color: Colors.white,
-            ),
-          ),
-        ),
-      ),
-    );
-
-    //add slivers one by one
-    slivers?.clear();
-    slivers = new List<Widget>();
-    slivers.add(sliverAppBar);
-    slivers.addAll(groups);
-    slivers.add(fillRemainingSliver);
   }
 }

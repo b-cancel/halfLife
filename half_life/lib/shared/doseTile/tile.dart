@@ -100,97 +100,86 @@ class _DoseTileState extends State<DoseTile> {
             },
           ),
         ],
-        child: Stack(
-          children: <Widget>[
-            Positioned.fill(
-              child: Container(
-                color: widget.isLast
-                    ? ThemeData.dark().scaffoldBackgroundColor
-                    : widget.softHeaderColor,
-              ),
-            ),
-            ClipRRect(
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(widget.isFirst ? 24 : 0),
-                topRight: Radius.circular(widget.isFirst ? 24 : 0),
-                bottomLeft: Radius.circular(widget.isLast ? 24 : 0),
-                bottomRight: Radius.circular(widget.isLast ? 24 : 0),
-              ),
-              child: Container(
-                color: Colors.white,
-                child: Column(
-                  children: <Widget>[
-                    ListTile(
-                      leading: Theme(
-                        data: Theme.of(context).copyWith(
-                          iconTheme: IconThemeData(
-                            color: ThemeData.dark().scaffoldBackgroundColor,
-                          ),
-                        ),
-                        child: ToTimeOfDay(
-                          timeStamp: widget.timeTaken,
-                        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(widget.isFirst ? 24 : 0),
+            topRight: Radius.circular(widget.isFirst ? 24 : 0),
+            bottomLeft: Radius.circular(widget.isLast ? 24 : 0),
+            bottomRight: Radius.circular(widget.isLast ? 24 : 0),
+          ),
+          child: Container(
+            color: Colors.white,
+            child: Column(
+              children: <Widget>[
+                ListTile(
+                  leading: Theme(
+                    data: Theme.of(context).copyWith(
+                      iconTheme: IconThemeData(
+                        color: ThemeData.dark().scaffoldBackgroundColor,
                       ),
-                      title: RichText(
-                        text: TextSpan(
+                    ),
+                    child: ToTimeOfDay(
+                      timeStamp: widget.timeTaken,
+                    ),
+                  ),
+                  title: RichText(
+                    text: TextSpan(
+                      style: TextStyle(
+                        color: ThemeData.dark().scaffoldBackgroundColor,
+                      ),
+                      children: [
+                        TextSpan(
+                          text: "Taken ",
+                        ),
+                        TextSpan(
+                          text: DurationFormat.format(
+                            widget.timeSinceTaken,
+                            //settings
+                            len: 2,
+                            spaceBetween: true,
+                            //no big quants
+                            showYears: false,
+                            showMonths: false,
+                            showWeeks: false,
+                            //yes medium quants
+                            showDays: true,
+                            showHours: true,
+                            showMinutes: true,
+                            //no little quants
+                            showSeconds: false,
+                            showMilliseconds: false,
+                            showMicroseconds: false,
+                          ),
                           style: TextStyle(
-                            color: ThemeData.dark().scaffoldBackgroundColor,
+                            fontWeight: FontWeight.bold,
                           ),
-                          children: [
-                            TextSpan(
-                              text: "Taken ",
-                            ),
-                            TextSpan(
-                              text: DurationFormat.format(
-                                widget.timeSinceTaken,
-                                //settings
-                                len: 2,
-                                spaceBetween: true,
-                                //no big quants
-                                showYears: false,
-                                showMonths: false,
-                                showWeeks: false,
-                                //yes medium quants
-                                showDays: true,
-                                showHours: true,
-                                showMinutes: true,
-                                //no little quants
-                                showSeconds: false,
-                                showMilliseconds: false,
-                                showMicroseconds: false,
-                              ),
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            TextSpan(
-                              text: " ago",
-                            )
-                          ],
                         ),
-                      ),
-                      subtitle: Text(
-                        "On " +
-                            DateTimeFormat.weekAndDay(
-                              widget.timeTaken,
-                            ),
-                      ),
-                      trailing: Text(
-                        widget.dose.round().toString(),
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
+                        TextSpan(
+                          text: " ago",
+                        )
+                      ],
+                    ),
+                  ),
+                  subtitle: Text(
+                    "On " +
+                        DateTimeFormat.weekAndDay(
+                          widget.timeTaken,
                         ),
-                      ),
+                  ),
+                  trailing: Text(
+                    widget.dose.round().toString(),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
                     ),
-                    Visibility(
-                      visible: widget.isLast == false,
-                      child: ListTileDivider(),
-                    ),
-                  ],
+                  ),
                 ),
-              ),
+                Visibility(
+                  visible: widget.isLast == false,
+                  child: ListTileDivider(),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

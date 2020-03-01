@@ -183,16 +183,33 @@ class _HeaderChartState extends State<HeaderChart> {
   }) {
     double totalDoseForThisPoint = 0;
 
-    //NOTE: point 0 should have the FIRST dose WE CARE about
-    //and consequent the first date time we care about
+    //iterate through all the doses 
+    //and check if its the first time we are working with one
+    int doseUsedForFirstTime;
+    for(int i = 0; i < widget.doses.length; i++){
+      //TODO: finish this
+    }
 
-    //each point indicates a last date time
-    Duration timeSinceForThisPoint = Duration(
-      microseconds:
-          (timeSinceDoseWeCareAbout.inMicroseconds * percentToEnd).round(),
+    //based on the baove determine the duration and date time to use everywhere below
+    Duration timeSinceForThisPoint;
+    if(doseUsedForFirstTime != null){
+      Dose firstTimeUseDose = widget.doses[doseUsedForFirstTime];
+      //TODO: make sure we are doing this right...
+      timeSinceForThisPoint = widget.lastDateTime.value.difference(
+        firstTimeUseDose.timeStamp,
+      );
+    }
+    else{
+      double ms = timeSinceDoseWeCareAbout.inMicroseconds * percentToEnd;
+      timeSinceForThisPoint = Duration(
+        microseconds: ms.round(),
+      );
+    }
+
+    //will serve as upper limit
+    DateTime lastDateTimeForThisPoint = dateTimeOfDoseWeCareAbout.add(
+      timeSinceForThisPoint,
     );
-    DateTime lastDateTimeForThisPoint =
-        dateTimeOfDoseWeCareAbout.add(timeSinceForThisPoint);
 
     //iterate through all the doses and see which ones we should include and include them
     for (int i = 0; i < widget.doses.length; i++) {
@@ -201,37 +218,13 @@ class _HeaderChartState extends State<HeaderChart> {
       DateTime timeTaken = thisDose.timeStamp;
       Duration timeSinceTaken = lastDateTimeForThisPoint.difference(timeTaken);
 
-      //check if we have used this before
-      bool canUseDose = doseDateTimesInChart.contains(timeTaken);
-      if (canUseDose == false) {
-        bool doseBefore = timeTaken.isBefore(lastDateTimeForThisPoint);
-        bool doseAt = (timeSinceTaken == Duration.zero);
-        canUseDose = doseAt || doseBefore;
-
-        //we can use this dose
-        //so save its DT
-        //and instead of using the calculated DT
-        //use the ACTUAL DT
-        if (canUseDose) {
-          /*
-                Duration timeSinceForThisPoint = Duration(
-            microseconds: (timeSinceDoseWeCareAbout.inMicroseconds *
-                    percentToEnd)
-                .round(),
-          );
-          DateTime lastDateTimeForThisPoint =
-              dateTimeOfDoseWeCareAbout.add(timeSinceForThisPoint);
-
-                Duration timeSinceTaken = lastDateTimeForThisPoint.difference(timeTaken);
-                */
-          //doseDateTimesInChart
-        }
-      }
+      //other stuff
+      bool doseBefore = timeTaken.isBefore(lastDateTimeForThisPoint);
+      bool doseAt = (timeSinceTaken == Duration.zero);
+      bool canUseDose = doseAt || doseBefore;
 
       //we can use this dose
       if (canUseDose) {
-        //TODO: could add segment data here
-
         double dose = thisDose.value;
 
         //allways use duration in microseconds
