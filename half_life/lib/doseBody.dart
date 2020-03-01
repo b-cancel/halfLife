@@ -1,6 +1,8 @@
 //flutter
 import 'package:flutter/material.dart';
-import 'package:half_life/main.dart';
+
+//plugin
+import 'package:scroll_to_index/scroll_to_index.dart';
 
 //internal
 import 'package:half_life/shared/scrollToTop.dart';
@@ -23,7 +25,7 @@ class DosesBody extends StatefulWidget {
 
 class _DosesBodyState extends State<DosesBody> {
   //scroll to top function
-  final ScrollController scrollController = new ScrollController();
+  final AutoScrollController scrollController = new AutoScrollController();
   final ValueNotifier<bool> onTop = new ValueNotifier(true);
   final ValueNotifier<double> overScroll = new ValueNotifier<double>(0);
 
@@ -70,7 +72,7 @@ class _DosesBodyState extends State<DosesBody> {
       body: Stack(
         children: <Widget>[
           DosesRefresh(
-            scrollController: scrollController,
+            autoScrollController: scrollController,
             halfLife: widget.halfLife,
             doses: widget.doses,
           ),

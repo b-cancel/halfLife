@@ -4,16 +4,21 @@ import 'package:half_life/shared/curvedCorner.dart';
 import 'package:half_life/shared/doseTile/tile.dart';
 import 'package:half_life/struct/doses.dart';
 import 'package:half_life/utils/dateTimeFormat.dart';
+import 'package:scroll_to_index/scroll_to_index.dart';
 
 //everything
 class DoseGroup extends StatelessWidget {
   DoseGroup({
     @required this.group,
     @required this.lastDateTime,
+    @required this.theSelectedDateTime,
+    @required this.autoScrollController,
   });
 
   final List<Dose> group;
   final ValueNotifier<DateTime> lastDateTime;
+  final ValueNotifier<DateTime> theSelectedDateTime;
+  final AutoScrollController autoScrollController;
 
   @override
   Widget build(BuildContext context) {
@@ -33,6 +38,7 @@ class DoseGroup extends StatelessWidget {
         itemBuilder: (BuildContext context, int index, anim) {
           DateTime timeTaken = group[index].timeStamp;
           return DoseTile(
+            id: group[index].id,
             isFirst: index == 0,
             isLast: index == group.length - 1,
             isEven: index % 2 == 0,
@@ -40,6 +46,8 @@ class DoseGroup extends StatelessWidget {
             dose: group[index].value,
             timeTaken: timeTaken,
             timeSinceTaken: lastDateTime.value.difference(timeTaken),
+            theSelectedDateTime: theSelectedDateTime,
+            autoScrollController: autoScrollController,
           );
         },
       ),

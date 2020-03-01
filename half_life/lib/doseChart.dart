@@ -184,6 +184,7 @@ class _HeaderChartState extends State<HeaderChart> {
 
           //add dose point
           dosePoints[pointID] = Dose(
+            0, //id doesnt here
             totalDoseForThisPoint,
             lastDateTimeForThisPoint,
           );

@@ -12,23 +12,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     List<Dose> doses = new List<Dose>();
-
-/*
-    doses.add(
-      Dose(
-        0,
-        DateTime(
-          2020,
-          1, //feb
-          20, //20
-          1, //1 am
-        ),
-      ),
-    );
-    */
+    List<int> iDs = [4,21,6,2,5,1,9,23,85,293,0];
 
     doses.add(
       Dose(
+        iDs[0],
         100,
         DateTime(
           2020,
@@ -41,6 +29,7 @@ class MyApp extends StatelessWidget {
 
     doses.add(
       Dose(
+        iDs[1],
         25,
         DateTime(
           2020,
@@ -51,22 +40,9 @@ class MyApp extends StatelessWidget {
       ),
     );
 
-/*
     doses.add(
       Dose(
-        0,
-        DateTime(
-          2020,
-          1, //feb
-          24, //20
-          6, //1 am
-        ),
-      ),
-    );
-    */
-
-    doses.add(
-      Dose(
+        iDs[2],
         0,
         DateTime(
           2020,
@@ -79,6 +55,7 @@ class MyApp extends StatelessWidget {
 
     doses.add(
       Dose(
+        iDs[3],
         0,
         DateTime(
           2020,
@@ -91,6 +68,7 @@ class MyApp extends StatelessWidget {
 
     doses.add(
       Dose(
+        iDs[4],
         0,
         DateTime(
           2020,
@@ -103,6 +81,7 @@ class MyApp extends StatelessWidget {
 
     doses.add(
       Dose(
+        iDs[5],
         0,
         DateTime(
           2020,
@@ -115,6 +94,7 @@ class MyApp extends StatelessWidget {
 
     doses.add(
       Dose(
+        iDs[6],
         0,
         DateTime(
           2020,
@@ -127,6 +107,7 @@ class MyApp extends StatelessWidget {
 
     doses.add(
       Dose(
+        iDs[7],
         0,
         DateTime(
           2020,
@@ -137,9 +118,9 @@ class MyApp extends StatelessWidget {
       ),
     );
 
-
     doses.add(
       Dose(
+        iDs[8],
         0,
         DateTime(
           2020,
@@ -152,6 +133,7 @@ class MyApp extends StatelessWidget {
 
     doses.add(
       Dose(
+        iDs[9],
         0,
         DateTime(
           2020,
@@ -162,10 +144,9 @@ class MyApp extends StatelessWidget {
       ),
     );
     
-
-
     doses.add(
       Dose(
+        iDs[10],
         50,
         DateTime(
           2020,

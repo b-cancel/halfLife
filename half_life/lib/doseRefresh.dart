@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 //plugin
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:scroll_to_index/scroll_to_index.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 //internal
@@ -14,12 +15,12 @@ import 'package:half_life/doseGroup.dart';
 //handle pull to refresh
 class DosesRefresh extends StatefulWidget {
   DosesRefresh({
-    @required this.scrollController,
+    @required this.autoScrollController,
     @required this.halfLife,
     @required this.doses,
   });
 
-  final ScrollController scrollController;
+  final AutoScrollController autoScrollController;
   final Duration halfLife;
   final List<Dose> doses;
 
@@ -28,6 +29,22 @@ class DosesRefresh extends StatefulWidget {
 }
 
 class _DosesRefreshState extends State<DosesRefresh> {
+  final ValueNotifier<DateTime> theSelectedDateTime = new ValueNotifier<DateTime>(
+    DateTime.now(), //immediately overriden
+  );
+  
+  @override
+  void initState() { 
+    //super init
+    super.initState();
+
+    //initially select DT is now
+    theSelectedDateTime.value = lastDateTime.value;
+    //selectDateTime.addListener(() { })
+  }
+
+  //-------------------------Refresh Code
+
   //atleast give people a second to realize what they did
   Duration loadTime = Duration(seconds: 1);
 
@@ -48,6 +65,8 @@ class _DosesRefreshState extends State<DosesRefresh> {
     if (mounted) setState(() {});
   }
 
+  //-------------------------Widget Builders
+
   //build
   @override
   Widget build(BuildContext context) {
@@ -58,13 +77,14 @@ class _DosesRefreshState extends State<DosesRefresh> {
     //build
     return SmartRefresher(
       physics: BouncingScrollPhysics(),
-      scrollController: widget.scrollController,
+      scrollController: widget.autoScrollController,
       //no footer animation
       enablePullUp: false,
       //yes header animation
       enablePullDown: true,
       header: WaterDropMaterialHeader(
         offset: chartHeight,
+        backgroundColor: Theme.of(context).accentColor,
         color: ThemeData.dark().scaffoldBackgroundColor,
       ),
       controller: refreshController,
@@ -84,7 +104,7 @@ class _DosesRefreshState extends State<DosesRefresh> {
       },
       child: CustomScrollView(
         physics: BouncingScrollPhysics(),
-        controller: widget.scrollController,
+        controller: widget.autoScrollController,
         slivers: slivers,
       ),
     );
@@ -151,7 +171,9 @@ class _DosesRefreshState extends State<DosesRefresh> {
       groups.add(
         DoseGroup(
           group: doseGroups[i],
+          theSelectedDateTime: theSelectedDateTime,
           lastDateTime: lastDateTime,
+          autoScrollController: widget.autoScrollController,
         ),
       );
     }

@@ -1,4 +1,5 @@
 class Dose{
+  int id;
   double value;
   DateTime timeStamp;
 
@@ -18,9 +19,11 @@ class Dose{
   }
 
   Dose(
+    int id,
     double value,
     DateTime timeStamp,
   ){
+    this.id = id;
     this.value = value;
     this.timeStamp = timeStamp;
   }

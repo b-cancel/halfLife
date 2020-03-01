@@ -4,10 +4,12 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:half_life/shared/tileDivider.dart';
 import 'package:half_life/utils/dateTimeFormat.dart';
 import 'package:half_life/utils/durationFormat.dart';
+import 'package:scroll_to_index/scroll_to_index.dart';
 
-class DoseTile extends StatelessWidget {
+class DoseTile extends StatefulWidget {
   const DoseTile({
     Key key,
+    @required this.id,
     //relative to entire list
     @required this.isFirst,
     @required this.isLast,
@@ -18,8 +20,12 @@ class DoseTile extends StatelessWidget {
     @required this.dose,
     @required this.timeTaken,
     @required this.timeSinceTaken,
+    //for selected date time
+    @required this.theSelectedDateTime,
+    @required this.autoScrollController,
   }) : super(key: key);
 
+  final int id;
   final bool isFirst;
   final bool isLast;
   final bool isEven;
@@ -29,133 +35,163 @@ class DoseTile extends StatelessWidget {
   final DateTime timeTaken;
   final Duration timeSinceTaken;
 
+  final ValueNotifier<DateTime> theSelectedDateTime;
+  final AutoScrollController autoScrollController;
+
+  @override
+  _DoseTileState createState() => _DoseTileState();
+}
+
+class _DoseTileState extends State<DoseTile> {
+  maybeScrollHere() {
+    widget.autoScrollController.scrollToIndex(
+      widget.id,
+      preferPosition: AutoScrollPosition.begin,
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Slidable(
-      actionPane: SlidableDrawerActionPane(),
-      actionExtentRatio: 0.25,
-      actions: <Widget>[
-        IconSlideAction(
+    return AutoScrollTag(
+      controller: widget.autoScrollController,
+      key: ValueKey(widget.id),
+      index: widget.id,
+      child: Slidable(
+        actionPane: SlidableDrawerActionPane(),
+        actionExtentRatio: 0.25,
+        actions: <Widget>[
+          IconSlideAction(
             caption: 'Archive',
             color: Colors.blue,
             icon: Icons.archive,
             onTap: () {
               print("more");
-            }),
-        IconSlideAction(
+            },
+          ),
+          IconSlideAction(
             caption: 'Share',
             color: Colors.indigo,
             icon: Icons.share,
             onTap: () {
               print("more");
-            }),
-      ],
-      secondaryActions: <Widget>[
-        IconSlideAction(
+            },
+          ),
+        ],
+        secondaryActions: <Widget>[
+          IconSlideAction(
             caption: 'More',
             color: Colors.black45,
             icon: Icons.more_horiz,
             onTap: () {
               print("more");
-            }),
-        IconSlideAction(
+            },
+          ),
+          IconSlideAction(
             caption: 'Delete',
             color: Colors.red,
             icon: Icons.delete,
             onTap: () {
               print("delete");
-            }),
-      ],
-      child: Stack(
-        children: <Widget>[
-          Positioned.fill(
-            child: Container(
-              color: isLast
-                  ? ThemeData.dark().scaffoldBackgroundColor
-                  : softHeaderColor,
-            ),
-          ),
-          ClipRRect(
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(isFirst ? 24 : 0),
-              topRight: Radius.circular(isFirst ? 24 : 0),
-              bottomLeft: Radius.circular(isLast ? 24 : 0),
-              bottomRight: Radius.circular(isLast ? 24 : 0),
-            ),
-            child: Container(
-              color: Colors.white,
-              child: Column(
-                children: <Widget>[
-                  ListTile(
-                    leading: Theme(
-                      data: Theme.of(context).copyWith(
-                          iconTheme: IconThemeData(
-                        color: ThemeData.dark().scaffoldBackgroundColor,
-                      )),
-                      child: ToTimeOfDay(
-                        timeStamp: timeTaken,
-                      ),
-                    ),
-                    title: RichText(
-                      text: TextSpan(
-                        style: TextStyle(
-                          color: ThemeData.dark().scaffoldBackgroundColor,
-                        ),
-                        children: [
-                          TextSpan(
-                            text: "Taken ",
-                          ),
-                          TextSpan(
-                            text: DurationFormat.format(
-                              timeSinceTaken,
-                              //settings
-                              len: 2,
-                              spaceBetween: true,
-                              //no big quants
-                              showYears: false,
-                              showMonths: false,
-                              showWeeks: false,
-                              //yes medium quants
-                              showDays: true,
-                              showHours: true,
-                              showMinutes: true,
-                              //no little quants
-                              showSeconds: false,
-                              showMilliseconds: false,
-                              showMicroseconds: false,
-                            ),
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          TextSpan(
-                            text: " ago",
-                          )
-                        ],
-                      ),
-                    ),
-                    subtitle: Text(
-                      "On " +
-                          DateTimeFormat.weekAndDay(
-                            timeTaken,
-                          ),
-                    ),
-                    trailing: Text(
-                      dose.round().toString(),
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  Visibility(
-                    visible: isLast == false,
-                    child: ListTileDivider(),
-                  ),
-                ],
-              ),
-            ),
+            },
           ),
         ],
+        child: Stack(
+          children: <Widget>[
+            Positioned.fill(
+              child: Container(
+                color: widget.isLast
+                    ? ThemeData.dark().scaffoldBackgroundColor
+                    : widget.softHeaderColor,
+              ),
+            ),
+            ClipRRect(
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(widget.isFirst ? 24 : 0),
+                topRight: Radius.circular(widget.isFirst ? 24 : 0),
+                bottomLeft: Radius.circular(widget.isLast ? 24 : 0),
+                bottomRight: Radius.circular(widget.isLast ? 24 : 0),
+              ),
+              child: Container(
+                color: Colors.white,
+                child: Column(
+                  children: <Widget>[
+                    ListTile(
+                      leading: Theme(
+                        data: Theme.of(context).copyWith(
+                          iconTheme: IconThemeData(
+                            color: ThemeData.dark().scaffoldBackgroundColor,
+                          ),
+                        ),
+                        child: ToTimeOfDay(
+                          timeStamp: widget.timeTaken,
+                        ),
+                      ),
+                      title: RichText(
+                        text: TextSpan(
+                          style: TextStyle(
+                            color: ThemeData.dark().scaffoldBackgroundColor,
+                          ),
+                          children: [
+                            TextSpan(
+                              text: "Taken ",
+                            ),
+                            TextSpan(
+                              text: DurationFormat.format(
+                                widget.timeSinceTaken,
+                                //settings
+                                len: 2,
+                                spaceBetween: true,
+                                //no big quants
+                                showYears: false,
+                                showMonths: false,
+                                showWeeks: false,
+                                //yes medium quants
+                                showDays: true,
+                                showHours: true,
+                                showMinutes: true,
+                                //no little quants
+                                showSeconds: false,
+                                showMilliseconds: false,
+                                showMicroseconds: false,
+                              ),
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            TextSpan(
+                              text: " ago",
+                            )
+                          ],
+                        ),
+                      ),
+                      subtitle: Text(
+                        "On " +
+                            DateTimeFormat.weekAndDay(
+                              widget.timeTaken,
+                            ),
+                      ),
+                      trailing: Text(
+                        widget.dose.round().toString(),
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    Visibility(
+                      visible: widget.isLast == false,
+                      child: ListTileDivider(),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
