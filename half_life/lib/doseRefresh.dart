@@ -4,6 +4,7 @@ import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 
 //plugin
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:half_life/main.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 //internal
@@ -54,7 +55,7 @@ class _DosesRefreshState extends State<DosesRefresh> {
   //update before settings state
   double chartHeight;
   List<Widget> slivers;
-  updateSlivers(){
+  updateSlivers() {
     //the doses that we just took go on top
     widget.doses.sort((a, b) => a.compareTo(b));
 
@@ -96,7 +97,7 @@ class _DosesRefreshState extends State<DosesRefresh> {
 
     //create app bar
     Widget sliverAppBar = SliverAppBar(
-      backgroundColor: widget.softHeaderColor,
+      backgroundColor: Theme.of(context).accentColor,
       //the top title (is basically the bottom AppBar)
       //NOTE: leading to left of title
       //NOTE: title in middle
@@ -125,9 +126,11 @@ class _DosesRefreshState extends State<DosesRefresh> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               IconButton(
-                icon: Icon(Icons.settings),
-                onPressed: () {
-                  print("change active dose");
+                icon: Icon(
+                  Icons.chevron_left,
+                ), 
+                onPressed: (){
+                  print("back to medication list");
                 },
               ),
               IconButton(
@@ -165,26 +168,167 @@ class _DosesRefreshState extends State<DosesRefresh> {
           StretchMode.zoomBackground,
         ],
         //the background with the graph and active dose
-        background: Container(
-          height: chartHeight,
-          width: MediaQuery.of(context).size.width,
-          padding: EdgeInsets.only(
-            top: statusBarHeight,
-            bottom: bottomBarHeight,
-          ),
-          child: HeaderChart(
-            lastDateTime: lastDateTime,
-            screenWidth: MediaQuery.of(context).size.width,
-            halfLife: widget.halfLife,
-            doses: widget.doses,
-          ),
+        background: Stack(
+          children: <Widget>[
+            Positioned.fill(
+              child: Column(
+                children: [
+                  Expanded(
+                    child: Container(
+                      color: ThemeData.dark().primaryColorDark,
+                    ),
+                  ),
+                  Expanded(
+                    child: Container(
+                      color: Theme.of(context).accentColor,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Container(
+              height: chartHeight,
+              width: MediaQuery.of(context).size.width,
+              padding: EdgeInsets.only(
+                top: statusBarHeight,
+                bottom: bottomBarHeight,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                children: <Widget>[
+                  Container(
+                    child: PreferredSize(
+                      preferredSize: Size(
+                        MediaQuery.of(context).size.width,
+                        56,
+                      ),
+                      child: AppBar(
+                        backgroundColor: ThemeData.dark().primaryColorDark,
+                        //not on top of screen
+                        primary: false,
+                        //give the edit half life button space
+                        centerTitle: false,
+                        //medication name
+                        title: Text(
+                          "Fluvoxamine",
+                          style: TextStyle(
+                            color: Theme.of(context).accentColor,
+                          ),
+                        ),
+                        //change half life name
+                        actions: <Widget>[
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 8,
+                            ),
+                            child: OutlineButton(
+                              highlightedBorderColor: Theme.of(context).accentColor,
+                              borderSide: BorderSide(
+                                color: ThemeData.dark().cardColor,
+                              ),
+                              padding: EdgeInsets.all(0),
+                              child: DefaultTextStyle(
+                                style: TextStyle(
+                                  color: Theme.of(context).accentColor,
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: <Widget>[
+                                    Padding(
+                                      padding: EdgeInsets.only(
+                                        left: 12.0,
+                                        right: 8,
+                                      ),
+                                      child: Text("36hrs"),
+                                    ),
+                                    Container(
+                                      color: Theme.of(context).accentColor,
+                                      height: 56.0 - (8 * 2),
+                                      width: 36,
+                                      padding: EdgeInsets.only(
+                                        right: 12,
+                                        left: 8,
+                                      ),
+                                      child: Transform.translate(
+                                        offset: Offset(12.0, 4),
+                                        child: DefaultTextStyle(
+                                          style: TextStyle(
+                                            color: ThemeData.dark().scaffoldBackgroundColor,
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                          child: Stack(
+                                            children: <Widget>[
+                                              Transform.translate(
+                                                offset: Offset(-12, -4),
+                                                child: Text(
+                                                  "t",
+                                                  style: TextStyle(
+                                                    fontSize: 26,
+                                                  ),
+                                                ),
+                                              ),
+                                              Transform.translate(
+                                                offset: Offset(0, 6),
+                                                child: Stack(
+                                                  children: [
+                                                    Transform.translate(
+                                                      offset: Offset(0, 0),
+                                                      child: Text(
+                                                        "1",
+                                                      ),
+                                                    ),
+                                                    Transform.translate(
+                                                      offset: Offset(0, 0),
+                                                      child: Text("_"),
+                                                    ),
+                                                    Transform.translate(
+                                                      offset: Offset(0, 12),
+                                                      child: Text("2"),
+                                                    ),
+                                                  ]
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              onPressed: () {
+                                print("change active dose");
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: Container(
+                      color: Theme.of(context).accentColor,
+                      child: HeaderChart(
+                        lastDateTime: lastDateTime,
+                        screenWidth: MediaQuery.of(context).size.width,
+                        halfLife: widget.halfLife,
+                        doses: widget.doses,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
 
     //generate group widgets
     List<Widget> groups = new List<Widget>();
-    for(int i = 0; i < doseGroups.length; i++){
+    for (int i = 0; i < doseGroups.length; i++) {
       groups.add(
         DoseGroup(
           group: doseGroups[i],
@@ -223,7 +367,7 @@ class _DosesRefreshState extends State<DosesRefresh> {
   //build
   @override
   Widget build(BuildContext context) {
-    if(slivers == null){
+    if (slivers == null) {
       updateSlivers();
     }
 
