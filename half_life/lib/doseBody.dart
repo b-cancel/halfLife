@@ -70,7 +70,6 @@ class _DosesBodyState extends State<DosesBody> {
       body: Stack(
         children: <Widget>[
           DosesRefresh(
-            softHeaderColor: MyApp.softHeaderColor,
             scrollController: scrollController,
             halfLife: widget.halfLife,
             doses: widget.doses,
@@ -78,7 +77,6 @@ class _DosesBodyState extends State<DosesBody> {
           ScrollToTopButton(
             onTop: onTop,
             overScroll: overScroll,
-            color: MyApp.softHeaderColor,
             scrollController: scrollController,
           ),
         ],

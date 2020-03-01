@@ -8,13 +8,11 @@ import 'package:flutter/material.dart';
 class ScrollToTopButton extends StatefulWidget {
   const ScrollToTopButton({
     Key key,
-    @required this.color,
     @required this.onTop,
     @required this.overScroll,
     @required this.scrollController,
   }) : super(key: key);
 
-  final Color color;
   final ValueNotifier<bool> onTop;
   final ValueNotifier<double> overScroll;
   final ScrollController scrollController;
@@ -62,7 +60,7 @@ class _ScrollToTopButtonState extends State<ScrollToTopButton> {
           ),
           child: FloatingActionButton(
             heroTag: 'toTop',
-            backgroundColor: widget.color,
+            backgroundColor: Theme.of(context).accentColor,
             onPressed: (){
               widget.scrollController.jumpTo(0);
             },

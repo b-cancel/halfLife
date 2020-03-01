@@ -16,13 +16,11 @@ import 'package:half_life/doseGroup.dart';
 //handle pull to refresh
 class DosesRefresh extends StatefulWidget {
   DosesRefresh({
-    @required this.softHeaderColor,
     @required this.scrollController,
     @required this.halfLife,
     @required this.doses,
   });
 
-  final Color softHeaderColor;
   final ScrollController scrollController;
   final Duration halfLife;
   final List<Dose> doses;
@@ -333,7 +331,6 @@ class _DosesRefreshState extends State<DosesRefresh> {
         DoseGroup(
           group: doseGroups[i],
           lastDateTime: lastDateTime,
-          softHeaderColor: widget.softHeaderColor,
         ),
       );
     }
@@ -382,7 +379,6 @@ class _DosesRefreshState extends State<DosesRefresh> {
       header: WaterDropMaterialHeader(
         offset: chartHeight,
         color: ThemeData.dark().scaffoldBackgroundColor,
-        backgroundColor: widget.softHeaderColor,
       ),
       controller: refreshController,
       onRefresh: () async {

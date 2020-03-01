@@ -10,12 +10,10 @@ class DoseGroup extends StatelessWidget {
   DoseGroup({
     @required this.group,
     @required this.lastDateTime,
-    @required this.softHeaderColor,
   });
 
   final List<Dose> group;
   final ValueNotifier<DateTime> lastDateTime;
-  final Color softHeaderColor;
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +36,7 @@ class DoseGroup extends StatelessWidget {
             isFirst: index == 0,
             isLast: index == group.length - 1,
             isEven: index % 2 == 0,
-            softHeaderColor: softHeaderColor,
+            softHeaderColor: Theme.of(context).accentColor,
             dose: group[index].value,
             timeTaken: timeTaken,
             timeSinceTaken: lastDateTime.value.difference(timeTaken),
