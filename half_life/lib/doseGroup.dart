@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
+import 'package:flutter_villains/villain.dart';
 import 'package:half_life/shared/curvedCorner.dart';
 import 'package:half_life/shared/doseTile/tile.dart';
 import 'package:half_life/struct/doses.dart';
@@ -31,47 +32,62 @@ class DoseGroup extends StatelessWidget {
 
     //build
     return SliverStickyHeader(
-      header: GroupHeader(
-        month: monthString,
-        year: firstDose.timeStamp.year.toString(),
+      header: Villain(
+        animateEntrance: true,
+        animateReEntrance: true,
+        animateExit: true,
+        villainAnimation: VillainAnimation.fromBottom(
+          relativeOffset: .5,
+        ),
+        secondaryVillainAnimation: VillainAnimation.fade(),
+        child: GroupHeader(
+          month: monthString,
+          year: firstDose.timeStamp.year.toString(),
+        ),
       ),
       sliver: SliverAnimatedList(
         initialItemCount: group.length,
         itemBuilder: (BuildContext context, int index, anim) {
           DateTime timeTaken = group[index].timeStamp;
-          return Stack(
-            children: <Widget>[
-              //for absolute last group
-              //the corner that are uncovered should match the filler sliver
-              Positioned.fill(
-                child: Column(
-                  children: [
+          return Villain(
+            animateEntrance: true,
+            animateReEntrance: true,
+            animateExit: true,
+            villainAnimation: VillainAnimation.fromBottom(
+              relativeOffset: .5,
+            ),
+            secondaryVillainAnimation: VillainAnimation.fade(),
+            child: Stack(
+              children: <Widget>[
+                //for absolute last group
+                //the corner that are uncovered should match the filler sliver
+                Positioned.fill(
+                  child: Column(children: [
                     //the top part of perhaps just ONE doseage
                     Expanded(child: Container()),
                     Expanded(
-                      child: Container(
-                        color: lastGroup 
-                        ? ThemeData.dark().scaffoldBackgroundColor 
-                        : Colors.transparent,
-                      )
-                    )
-                  ]
+                        child: Container(
+                      color: lastGroup
+                          ? ThemeData.dark().scaffoldBackgroundColor
+                          : Colors.transparent,
+                    ))
+                  ]),
                 ),
-              ),
-              //the tile
-              DoseTile(
-                id: group[index].id,
-                isFirst: index == 0,
-                isLast: index == group.length - 1,
-                isEven: index % 2 == 0,
-                softHeaderColor: Theme.of(context).accentColor,
-                dose: group[index].value,
-                timeTaken: timeTaken,
-                timeSinceTaken: lastDateTime.value.difference(timeTaken),
-                theSelectedDateTime: theSelectedDateTime,
-                autoScrollController: autoScrollController,
-              ),
-            ],
+                //the tile
+                DoseTile(
+                  id: group[index].id,
+                  isFirst: index == 0,
+                  isLast: index == group.length - 1,
+                  isEven: index % 2 == 0,
+                  softHeaderColor: Theme.of(context).accentColor,
+                  dose: group[index].value,
+                  timeTaken: timeTaken,
+                  timeSinceTaken: lastDateTime.value.difference(timeTaken),
+                  theSelectedDateTime: theSelectedDateTime,
+                  autoScrollController: autoScrollController,
+                ),
+              ],
+            ),
           );
         },
       ),
@@ -107,10 +123,9 @@ class GroupHeader extends StatelessWidget {
           alignment: Alignment.bottomLeft,
           child: DefaultTextStyle(
             style: TextStyle(
-              fontSize: 16,
-              color: Colors.white, //TODO: maybe use soft header color?
-              fontWeight: FontWeight.bold
-            ),
+                fontSize: 16,
+                color: Colors.white, //TODO: maybe use soft header color?
+                fontWeight: FontWeight.bold),
             child: Row(
               mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -126,32 +141,31 @@ class GroupHeader extends StatelessWidget {
           ),
         ),
         Positioned(
-          bottom: 0,
-          left: 0,
-          right: 0,
-          child: Container(
-            width: MediaQuery.of(context).size.width,
-            child: Transform.translate(
-              offset: Offset(0, 24),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                mainAxisSize: MainAxisSize.max,
-                children: [
-                  CurvedCorner(
-                    isTop: true, 
-                    isLeft: true, 
-                    cornerColor: backgroundColor,
-                  ),
-                  CurvedCorner(
-                    isTop: true, 
-                    isLeft: false, 
-                    cornerColor: backgroundColor,
-                  ),
-                ],
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              width: MediaQuery.of(context).size.width,
+              child: Transform.translate(
+                offset: Offset(0, 24),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    CurvedCorner(
+                      isTop: true,
+                      isLeft: true,
+                      cornerColor: backgroundColor,
+                    ),
+                    CurvedCorner(
+                      isTop: true,
+                      isLeft: false,
+                      cornerColor: backgroundColor,
+                    ),
+                  ],
+                ),
               ),
-            ),
-          )
-        ),
+            )),
       ],
     );
   }
