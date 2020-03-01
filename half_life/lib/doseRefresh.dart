@@ -2,7 +2,6 @@
 import 'package:flutter/material.dart';
 
 //plugin
-import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -133,39 +132,37 @@ class _DosesRefreshState extends State<DosesRefresh> {
     //build
     return Container(
       color: ThemeData.dark().primaryColorDark,
-      child: AnimationLimiter(
-        child: SmartRefresher(
-          scrollController: widget.autoScrollController,
+      child: SmartRefresher(
+        scrollController: widget.autoScrollController,
+        physics: BouncingScrollPhysics(),
+        //no footer animation
+        enablePullUp: false,
+        //yes header animation
+        enablePullDown: true,
+        header: WaterDropMaterialHeader(
+          offset: chartHeight,
+          backgroundColor: Theme.of(context).accentColor,
+          color: ThemeData.dark().scaffoldBackgroundColor,
+        ),
+        controller: refreshController,
+        onRefresh: () async {
+          updateDateTime();
+          // monitor network fetch
+          await Future.delayed(loadTime);
+          // if failed,use refreshFailed()
+          refreshController.refreshCompleted();
+        },
+        onLoading: () async {
+          updateDateTime();
+          // monitor network fetch
+          await Future.delayed(loadTime);
+          // if failed,use loadFailed(),if no data return,use LoadNodata()
+          refreshController.loadComplete();
+        },
+        child: CustomScrollView(
           physics: BouncingScrollPhysics(),
-          //no footer animation
-          enablePullUp: false,
-          //yes header animation
-          enablePullDown: true,
-          header: WaterDropMaterialHeader(
-            offset: chartHeight,
-            backgroundColor: Theme.of(context).accentColor,
-            color: ThemeData.dark().scaffoldBackgroundColor,
-          ),
-          controller: refreshController,
-          onRefresh: () async {
-            updateDateTime();
-            // monitor network fetch
-            await Future.delayed(loadTime);
-            // if failed,use refreshFailed()
-            refreshController.refreshCompleted();
-          },
-          onLoading: () async {
-            updateDateTime();
-            // monitor network fetch
-            await Future.delayed(loadTime);
-            // if failed,use loadFailed(),if no data return,use LoadNodata()
-            refreshController.loadComplete();
-          },
-          child: CustomScrollView(
-            physics: BouncingScrollPhysics(),
-            controller: widget.autoScrollController,
-            slivers: slivers,
-          ),
+          controller: widget.autoScrollController,
+          slivers: slivers,
         ),
       ),
     );
