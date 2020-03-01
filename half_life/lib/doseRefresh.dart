@@ -131,40 +131,41 @@ class _DosesRefreshState extends State<DosesRefresh> {
     slivers.add(fillRemainingSliver);
 
     //build
-    return SmartRefresher(
-      physics: BouncingScrollPhysics(),
-      scrollController: widget.autoScrollController,
-      //no footer animation
-      enablePullUp: false,
-      //yes header animation
-      enablePullDown: true,
-      header: WaterDropMaterialHeader(
-        offset: chartHeight,
-        backgroundColor: Theme.of(context).accentColor,
-        color: ThemeData.dark().scaffoldBackgroundColor,
-      ),
-      controller: refreshController,
-      onRefresh: () async {
-        updateDateTime();
-        // monitor network fetch
-        await Future.delayed(loadTime);
-        // if failed,use refreshFailed()
-        refreshController.refreshCompleted();
-      },
-      onLoading: () async {
-        updateDateTime();
-        // monitor network fetch
-        await Future.delayed(loadTime);
-        // if failed,use loadFailed(),if no data return,use LoadNodata()
-        refreshController.loadComplete();
-      },
-      child: Container(
-        //match section headers
-        color: ThemeData.dark().primaryColorDark,
-        child: CustomScrollView(
+    return Container(
+      color: ThemeData.dark().primaryColorDark,
+      child: AnimationLimiter(
+        child: SmartRefresher(
+          scrollController: widget.autoScrollController,
           physics: BouncingScrollPhysics(),
-          controller: widget.autoScrollController,
-          slivers: slivers,
+          //no footer animation
+          enablePullUp: false,
+          //yes header animation
+          enablePullDown: true,
+          header: WaterDropMaterialHeader(
+            offset: chartHeight,
+            backgroundColor: Theme.of(context).accentColor,
+            color: ThemeData.dark().scaffoldBackgroundColor,
+          ),
+          controller: refreshController,
+          onRefresh: () async {
+            updateDateTime();
+            // monitor network fetch
+            await Future.delayed(loadTime);
+            // if failed,use refreshFailed()
+            refreshController.refreshCompleted();
+          },
+          onLoading: () async {
+            updateDateTime();
+            // monitor network fetch
+            await Future.delayed(loadTime);
+            // if failed,use loadFailed(),if no data return,use LoadNodata()
+            refreshController.loadComplete();
+          },
+          child: CustomScrollView(
+            physics: BouncingScrollPhysics(),
+            controller: widget.autoScrollController,
+            slivers: slivers,
+          ),
         ),
       ),
     );
