@@ -10,11 +10,13 @@ class ScrollToTopButton extends StatefulWidget {
     Key key,
     @required this.color,
     @required this.onTop,
+    @required this.overScroll,
     @required this.scrollController,
   }) : super(key: key);
 
   final Color color;
   final ValueNotifier<bool> onTop;
+  final ValueNotifier<double> overScroll;
   final ScrollController scrollController;
 
   @override
@@ -29,11 +31,13 @@ class _ScrollToTopButtonState extends State<ScrollToTopButton> {
   @override
   void initState() {
     widget.onTop.addListener(updateState);
+    widget.overScroll.addListener(updateState);
     super.initState();
   }
 
   @override
   void dispose() {
+    widget.overScroll.removeListener(updateState);
     widget.onTop.removeListener(updateState);
     super.dispose();
   }
@@ -41,7 +45,7 @@ class _ScrollToTopButtonState extends State<ScrollToTopButton> {
   @override
   Widget build(BuildContext context) {
     return Positioned(
-      bottom: 0,
+      bottom: widget.overScroll.value / 2,
       left: 0,
       right: 0,
       child: Container(

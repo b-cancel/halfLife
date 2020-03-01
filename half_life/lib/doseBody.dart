@@ -25,14 +25,20 @@ class _DosesBodyState extends State<DosesBody> {
   //scroll to top function
   final ScrollController scrollController = new ScrollController();
   final ValueNotifier<bool> onTop = new ValueNotifier(true);
+  final ValueNotifier<double> overScroll = new ValueNotifier<double>(0);
 
   //If we scroll down have the scroll up button come up
   updateOnTopValue() {
     ScrollPosition position = scrollController.position;
-    double currentOffset = scrollController.offset;
+    //double currentOffset = scrollController.offset;
+
+    //update overscroll to cover pill bottle if possible
+    double curr = position.pixels;
+    double max = position.maxScrollExtent;
+    overScroll.value = (curr < max) ? 0 : curr - max;
 
     //Determine whether we are on the top of the scroll area
-    if (currentOffset <= position.minScrollExtent) {
+    if (curr <= position.minScrollExtent) {
       onTop.value = true;
     } else
       onTop.value = false;
@@ -71,6 +77,7 @@ class _DosesBodyState extends State<DosesBody> {
           ),
           ScrollToTopButton(
             onTop: onTop,
+            overScroll: overScroll,
             color: MyApp.softHeaderColor,
             scrollController: scrollController,
           ),
