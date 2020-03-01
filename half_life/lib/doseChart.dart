@@ -25,6 +25,7 @@ class HeaderChart extends StatefulWidget {
     @required this.halfLife,
     @required this.doses,
     @required this.lastDateTime,
+    @required this.theSelectedDateTime,
   });
 
   final double screenWidth;
@@ -32,6 +33,7 @@ class HeaderChart extends StatefulWidget {
   final Duration halfLife;
   final List<Dose> doses;
   final ValueNotifier<DateTime> lastDateTime;
+  final ValueNotifier<DateTime> theSelectedDateTime;
 
   @override
   _HeaderChartState createState() => _HeaderChartState();
@@ -44,7 +46,7 @@ class _HeaderChartState extends State<HeaderChart> {
   ValueNotifier<double> selectedActiveDosage;
 
   updateSeries() {
-    seriesList = fromDoses(dosePoints());
+    seriesList = fromDoses(getDosePoints());
     if (mounted) setState(() {});
   }
 
@@ -60,7 +62,7 @@ class _HeaderChartState extends State<HeaderChart> {
     selectedActiveDosage = new ValueNotifier<double>(0);
 
     //dose point init
-    seriesList = fromDoses(dosePoints());
+    seriesList = fromDoses(getDosePoints());
 
     //listen to date time changes
     widget.lastDateTime.addListener(updateSeries);
@@ -95,7 +97,7 @@ class _HeaderChartState extends State<HeaderChart> {
 
       //add to active dose
       activeDoseSoFar += dosageLeft;
-      
+
       //if our active dose is no longer irelevant with this point
       //we found the first dose we care about
       if (activeDoseSoFar > maxIrelevantDose) {
@@ -107,7 +109,13 @@ class _HeaderChartState extends State<HeaderChart> {
     return -1; //we don't care about any dose
   }
 
-  List<Dose> dosePoints() {
+  //keep track of dose DT we have used
+  //so we can change the selection pointer styling
+  //and so we have to do less work for every run of this function
+  Set<DateTime> doseDateTimesInChart = new Set<DateTime>();
+  List<Dose> getDosePoints() {
+    doseDateTimesInChart.clear();
+
     //we have never taken a dose
     if (widget.doses.length == 0)
       return [];
@@ -131,7 +139,8 @@ class _HeaderChartState extends State<HeaderChart> {
       if (firstDoseWeCareToShow == -1) {
         return null;
       } else {
-        DateTime dateTimeOfDoseWeCareAbout = widget.doses[firstDoseWeCareToShow].timeStamp;
+        DateTime dateTimeOfDoseWeCareAbout =
+            widget.doses[firstDoseWeCareToShow].timeStamp;
         Duration timeSinceDoseWeCareAbout = lastDate.difference(
           dateTimeOfDoseWeCareAbout,
         );
@@ -142,51 +151,13 @@ class _HeaderChartState extends State<HeaderChart> {
 
         //create/update all of our dosePoints
         for (int pointID = 0; pointID < maxPoints; pointID++) {
-          double totalDoseForThisPoint = 0;
-
-          //start at 0(first dose DT), ends at 1(right now)
-          double percentToEnd = (pointID / maxPoints);
-
-          //NOTE: point 0 should have the FIRST dose WE CARE about
-          //and consequent the first date time we care about
-
-          //each point indicates a last date time
-          Duration timeSinceForThisPoint = Duration(
-            microseconds: (timeSinceDoseWeCareAbout.inMicroseconds *
-                    percentToEnd)
-                .round(),
-          );
-          DateTime lastDateTimeForThisPoint =
-              dateTimeOfDoseWeCareAbout.add(timeSinceForThisPoint);
-
-          //iterate through all the doses and see which ones we should include and include them
-          for (int i = 0; i < widget.doses.length; i++) {
-            Dose thisDose = widget.doses[i];
-            DateTime timeTaken = thisDose.timeStamp;
-            bool doseBefore = timeTaken.isBefore(lastDateTimeForThisPoint);
-            Duration timeSinceTaken = lastDateTimeForThisPoint.difference(timeTaken);
-            bool doseAt = (timeSinceTaken == Duration.zero);
-            if (doseAt || doseBefore) {
-              //TODO: could add segment data here
-
-              double dose = thisDose.value;
-
-              //allways use duration in microseconds
-              double decayConstant =
-                  math.log(2) / widget.halfLife.inMicroseconds;
-              double exponent = -decayConstant * timeSinceTaken.inMicroseconds;
-              double dosageLeft = dose * math.pow(math.e, exponent);
-
-              totalDoseForThisPoint += dosageLeft;
-            }
-            //ELSE: we don't count it
-          }
-
-          //add dose point
-          dosePoints[pointID] = Dose(
-            0, //id doesnt here
-            totalDoseForThisPoint,
-            lastDateTimeForThisPoint,
+          createPoint(
+            dosePoints,
+            pointID: pointID,
+            //start at 0(first dose DT), ends at 1(right now)
+            percentToEnd: (pointID / maxPoints),
+            timeSinceDoseWeCareAbout: timeSinceDoseWeCareAbout,
+            dateTimeOfDoseWeCareAbout: dateTimeOfDoseWeCareAbout,
           );
         }
 
@@ -198,6 +169,87 @@ class _HeaderChartState extends State<HeaderChart> {
         return dosePoints;
       }
     }
+  }
+
+  //we use percent to end if no ACTUAL dose start at this point
+  //else we use that doses date time to calculate everything the percentToEnd would
+  //TODO: do the above
+  createPoint(
+    List<Dose> dosePoints, {
+    int pointID,
+    double percentToEnd,
+    Duration timeSinceDoseWeCareAbout,
+    DateTime dateTimeOfDoseWeCareAbout,
+  }) {
+    double totalDoseForThisPoint = 0;
+
+    //NOTE: point 0 should have the FIRST dose WE CARE about
+    //and consequent the first date time we care about
+
+    //each point indicates a last date time
+    Duration timeSinceForThisPoint = Duration(
+      microseconds:
+          (timeSinceDoseWeCareAbout.inMicroseconds * percentToEnd).round(),
+    );
+    DateTime lastDateTimeForThisPoint =
+        dateTimeOfDoseWeCareAbout.add(timeSinceForThisPoint);
+
+    //iterate through all the doses and see which ones we should include and include them
+    for (int i = 0; i < widget.doses.length; i++) {
+      //easy access variables
+      Dose thisDose = widget.doses[i];
+      DateTime timeTaken = thisDose.timeStamp;
+      Duration timeSinceTaken = lastDateTimeForThisPoint.difference(timeTaken);
+
+      //check if we have used this before
+      bool canUseDose = doseDateTimesInChart.contains(timeTaken);
+      if (canUseDose == false) {
+        bool doseBefore = timeTaken.isBefore(lastDateTimeForThisPoint);
+        bool doseAt = (timeSinceTaken == Duration.zero);
+        canUseDose = doseAt || doseBefore;
+
+        //we can use this dose
+        //so save its DT
+        //and instead of using the calculated DT
+        //use the ACTUAL DT
+        if (canUseDose) {
+          /*
+                Duration timeSinceForThisPoint = Duration(
+            microseconds: (timeSinceDoseWeCareAbout.inMicroseconds *
+                    percentToEnd)
+                .round(),
+          );
+          DateTime lastDateTimeForThisPoint =
+              dateTimeOfDoseWeCareAbout.add(timeSinceForThisPoint);
+
+                Duration timeSinceTaken = lastDateTimeForThisPoint.difference(timeTaken);
+                */
+          //doseDateTimesInChart
+        }
+      }
+
+      //we can use this dose
+      if (canUseDose) {
+        //TODO: could add segment data here
+
+        double dose = thisDose.value;
+
+        //allways use duration in microseconds
+        double decayConstant = math.log(2) / widget.halfLife.inMicroseconds;
+        double exponent = -decayConstant * timeSinceTaken.inMicroseconds;
+        double dosageLeft = dose * math.pow(math.e, exponent);
+
+        totalDoseForThisPoint += dosageLeft;
+      }
+      //ELSE: we don't count it
+    }
+
+    //add dose point
+    dosePoints[pointID] = Dose(
+      0, //id doesnt here
+      totalDoseForThisPoint,
+      lastDateTimeForThisPoint,
+    );
   }
 
   @override

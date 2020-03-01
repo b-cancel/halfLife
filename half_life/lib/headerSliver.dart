@@ -5,7 +5,7 @@ import 'package:half_life/struct/doses.dart';
 class HeaderSliver extends StatelessWidget {
   const HeaderSliver({
     Key key,
-    @required this.context,
+    @required this.theSelectedDateTime,
     @required this.bottomBarHeight,
     @required this.chartHeight,
     @required this.statusBarHeight,
@@ -14,7 +14,7 @@ class HeaderSliver extends StatelessWidget {
     @required this.halfLife,
   }) : super(key: key);
 
-  final BuildContext context;
+  final ValueNotifier<DateTime> theSelectedDateTime;
   final double bottomBarHeight;
   final double chartHeight;
   final double statusBarHeight;
@@ -240,6 +240,7 @@ class HeaderSliver extends StatelessWidget {
                       color: Theme.of(context).accentColor,
                       child: HeaderChart(
                         lastDateTime: lastDateTime,
+                        theSelectedDateTime: theSelectedDateTime,
                         screenWidth: MediaQuery.of(context).size.width,
                         halfLife: halfLife,
                         doses: doses,

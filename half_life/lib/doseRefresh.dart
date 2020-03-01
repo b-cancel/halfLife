@@ -156,7 +156,7 @@ class _DosesRefreshState extends State<DosesRefresh> {
 
     //create app bar
     Widget sliverAppBar = HeaderSliver(
-      context: context, 
+      theSelectedDateTime: theSelectedDateTime,
       bottomBarHeight: bottomBarHeight, 
       chartHeight: chartHeight, 
       statusBarHeight: statusBarHeight, 
