@@ -6,11 +6,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
-//villains
-import 'package:flutter_villains/villain.dart';
-import 'package:flutter_villains/villains/utils.dart';
-import 'package:flutter_villains/villains/villains.dart';
-
 //internal
 import 'package:half_life/utils/goldenRatio.dart';
 import 'package:half_life/struct/doses.dart';
@@ -42,12 +37,6 @@ class _DosesRefreshState extends State<DosesRefresh> {
   void initState() { 
     //super init
     super.initState();
-
-    //for debuging
-    WidgetsBinding.instance.addPostFrameCallback((_){
-      print("playing animation");
-      VillainController.playAllVillains(context);
-    });
 
     //initially select DT is now
     theSelectedDateTime.value = lastDateTime.value;

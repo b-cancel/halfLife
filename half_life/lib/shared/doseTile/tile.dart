@@ -5,6 +5,8 @@ import 'package:half_life/shared/tileDivider.dart';
 import 'package:half_life/utils/dateTimeFormat.dart';
 import 'package:half_life/utils/durationFormat.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
+import 'package:folding_cell/folding_cell.dart';
+import 'package:matrix4_transform/matrix4_transform.dart';
 
 class DoseTile extends StatefulWidget {
   const DoseTile({
@@ -43,6 +45,8 @@ class DoseTile extends StatefulWidget {
 }
 
 class _DoseTileState extends State<DoseTile> {
+  final _foldingCellKey = GlobalKey<SimpleFoldingCellState>();
+
   maybeScrollHere() {
     widget.autoScrollController.scrollToIndex(
       widget.id,
@@ -57,11 +61,170 @@ class _DoseTileState extends State<DoseTile> {
 
   @override
   Widget build(BuildContext context) {
+    Widget header = ClipRRect(
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(widget.isFirst ? 24 : 0),
+            topRight: Radius.circular(widget.isFirst ? 24 : 0),
+            bottomLeft: Radius.circular(widget.isLast ? 24 : 0),
+            bottomRight: Radius.circular(widget.isLast ? 24 : 0),
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: (){
+                _foldingCellKey?.currentState?.toggleFold();
+              },
+              child: Container(
+                color: Colors.white,
+                child: Column(
+                  children: <Widget>[
+                    ListTile(
+                      leading: SizedBox(
+                        width: 42,
+                        height: 42,
+                        child: ToTimeOfDay(
+                          timeStamp: widget.timeTaken,
+                        ),
+                      ),
+                      title: RichText(
+                        text: TextSpan(
+                          style: TextStyle(
+                            color: ThemeData.dark().scaffoldBackgroundColor,
+                          ),
+                          children: [
+                            TextSpan(
+                              text: "Taken ",
+                            ),
+                            TextSpan(
+                              text: DurationFormat.format(
+                                widget.timeSinceTaken,
+                                //settings
+                                len: 2,
+                                spaceBetween: true,
+                                //no big quants
+                                showYears: false,
+                                showMonths: false,
+                                showWeeks: false,
+                                //yes medium quants
+                                showDays: true,
+                                showHours: true,
+                                showMinutes: true,
+                                //no little quants
+                                showSeconds: false,
+                                showMilliseconds: false,
+                                showMicroseconds: false,
+                              ),
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            TextSpan(
+                              text: " ago",
+                            )
+                          ],
+                        ),
+                      ),
+                      subtitle: Text(
+                        "On " +
+                            DateTimeFormat.weekAndDay(
+                              widget.timeTaken,
+                            ),
+                      ),
+                      trailing: Text(
+                        widget.dose.round().toString(),
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    Visibility(
+                      visible: widget.isLast == false,
+                      child: ListTileDivider(),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+
+    Size tileSize = Size(
+          MediaQuery.of(context).size.width,
+          72.0 + 1, //height + size of divider
+        );
+
+
     return AutoScrollTag(
       controller: widget.autoScrollController,
       key: ValueKey(widget.id),
       index: widget.id,
-      child: Slidable(
+      child: Stack(
+        children: <Widget>[
+          
+          Transform.translate(
+            offset: Offset(tileSize.width, 0),
+            child: Transform(
+              transform: Matrix4Transform().flipHorizontally(
+                origin: Offset(0, 0)
+              ).matrix4,
+              child: SimpleFoldingCell(
+                key: _foldingCellKey,
+                
+                padding: EdgeInsets.all(0),
+                frontWidget: GestureDetector(
+                  onTap: () => _foldingCellKey?.currentState?.toggleFold(),
+                  child: Container(
+                        width: tileSize.width,
+                        height: tileSize.height,
+                        color: Colors.transparent,
+                      ),
+                ),
+                innerTopWidget: GestureDetector(
+                  onTap: () => _foldingCellKey?.currentState?.toggleFold(),
+                  child: Container(
+                        width: tileSize.width,
+                        height: tileSize.height,
+                        color: Colors.transparent,
+                      ),
+                ),
+                innerBottomWidget: GestureDetector(
+                  onTap: () => _foldingCellKey?.currentState?.toggleFold(),
+                  child: Container(
+                    width: tileSize.width,
+                    height: tileSize.height,
+                    color: Colors.red,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        "hi",
+                        style: TextStyle(
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                cellSize: tileSize,
+                animationDuration: Duration(milliseconds: 3000),
+                onOpen: () => print('cell opened'),
+                onClose: () => print('cell closed'),
+              ),
+            ),
+          ),
+          
+          
+          SizedBox(
+            width: tileSize.width,
+            height: tileSize.height,
+            child: header,
+          ),
+          
+        ],
+      ),
+    
+      
+      /*
+      Slidable(
         actionPane: SlidableDrawerActionPane(),
         actionExtentRatio: 0.25,
         actions: <Widget>[
@@ -100,89 +263,11 @@ class _DoseTileState extends State<DoseTile> {
             },
           ),
         ],
-        child: ClipRRect(
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(widget.isFirst ? 24 : 0),
-            topRight: Radius.circular(widget.isFirst ? 24 : 0),
-            bottomLeft: Radius.circular(widget.isLast ? 24 : 0),
-            bottomRight: Radius.circular(widget.isLast ? 24 : 0),
-          ),
-          child: Container(
-            color: Colors.white,
-            child: Column(
-              children: <Widget>[
-                ListTile(
-                  leading: Theme(
-                    data: Theme.of(context).copyWith(
-                      iconTheme: IconThemeData(
-                        color: ThemeData.dark().scaffoldBackgroundColor,
-                      ),
-                    ),
-                    child: ToTimeOfDay(
-                      timeStamp: widget.timeTaken,
-                    ),
-                  ),
-                  title: RichText(
-                    text: TextSpan(
-                      style: TextStyle(
-                        color: ThemeData.dark().scaffoldBackgroundColor,
-                      ),
-                      children: [
-                        TextSpan(
-                          text: "Taken ",
-                        ),
-                        TextSpan(
-                          text: DurationFormat.format(
-                            widget.timeSinceTaken,
-                            //settings
-                            len: 2,
-                            spaceBetween: true,
-                            //no big quants
-                            showYears: false,
-                            showMonths: false,
-                            showWeeks: false,
-                            //yes medium quants
-                            showDays: true,
-                            showHours: true,
-                            showMinutes: true,
-                            //no little quants
-                            showSeconds: false,
-                            showMilliseconds: false,
-                            showMicroseconds: false,
-                          ),
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        TextSpan(
-                          text: " ago",
-                        )
-                      ],
-                    ),
-                  ),
-                  subtitle: Text(
-                    "On " +
-                        DateTimeFormat.weekAndDay(
-                          widget.timeTaken,
-                        ),
-                  ),
-                  trailing: Text(
-                    widget.dose.round().toString(),
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                Visibility(
-                  visible: widget.isLast == false,
-                  child: ListTileDivider(),
-                ),
-              ],
-            ),
-          ),
-        ),
+        child: 
       ),
+      */
     );
+    
   }
 }
 

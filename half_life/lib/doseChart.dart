@@ -8,7 +8,6 @@ import 'package:half_life/shared/conditional.dart';
 import 'package:half_life/shared/doseTile/tile.dart';
 import 'package:half_life/struct/doses.dart';
 import 'package:half_life/utils/dateTimeFormat.dart';
-import 'package:half_life/utils/durationFormat.dart';
 import 'package:half_life/utils/goldenRatio.dart';
 
 /*

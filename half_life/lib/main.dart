@@ -1,5 +1,6 @@
 //flutter
 import 'package:flutter/material.dart';
+import 'package:flutter_villains/villain.dart';
 
 //internal
 import 'package:half_life/struct/doses.dart';
@@ -159,6 +160,9 @@ class MyApp extends StatelessWidget {
 
     return MaterialApp(
       title: 'Half Life',
+      navigatorObservers: [
+        VillainTransitionObserver(),
+      ],
       theme: ThemeData.light().copyWith(
         accentColor: Color(0xFF64ffda),
       ),
