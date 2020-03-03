@@ -62,16 +62,19 @@ class DoseGroup extends StatelessWidget {
                 //for absolute last group
                 //the corner that are uncovered should match the filler sliver
                 Positioned.fill(
-                  child: Column(children: [
-                    //the top part of perhaps just ONE doseage
-                    Expanded(child: Container()),
-                    Expanded(
+                  child: Column(
+                    children: [
+                      //the top part of perhaps just ONE doseage
+                      Expanded(child: Container()),
+                      Expanded(
                         child: Container(
-                      color: lastGroup
-                          ? ThemeData.dark().scaffoldBackgroundColor
-                          : Colors.transparent,
-                    ))
-                  ]),
+                          color: lastGroup
+                              ? ThemeData.dark().scaffoldBackgroundColor
+                              : Colors.transparent,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 //the tile
                 DoseTile(

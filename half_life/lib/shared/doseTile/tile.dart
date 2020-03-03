@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:half_life/shared/tileDivider.dart';
 import 'package:half_life/utils/dateTimeFormat.dart';
 import 'package:half_life/utils/durationFormat.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
-import 'package:folding_cell/folding_cell.dart';
-import 'package:matrix4_transform/matrix4_transform.dart';
+import 'package:vector_math/vector_math_64.dart' as vect;
 
 class DoseTile extends StatefulWidget {
   const DoseTile({
@@ -45,7 +43,8 @@ class DoseTile extends StatefulWidget {
 }
 
 class _DoseTileState extends State<DoseTile> {
-  final _foldingCellKey = GlobalKey<SimpleFoldingCellState>();
+  final ValueNotifier<bool> isOpen = new ValueNotifier<bool>(false);
+  final Duration animationDuration = Duration(milliseconds: 300);
 
   maybeScrollHere() {
     widget.autoScrollController.scrollToIndex(
@@ -61,213 +60,183 @@ class _DoseTileState extends State<DoseTile> {
 
   @override
   Widget build(BuildContext context) {
-    Widget header = ClipRRect(
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(widget.isFirst ? 24 : 0),
-            topRight: Radius.circular(widget.isFirst ? 24 : 0),
-            bottomLeft: Radius.circular(widget.isLast ? 24 : 0),
-            bottomRight: Radius.circular(widget.isLast ? 24 : 0),
-          ),
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: (){
-                _foldingCellKey?.currentState?.toggleFold();
-              },
-              child: Container(
-                color: Colors.white,
-                child: Column(
-                  children: <Widget>[
-                    ListTile(
-                      leading: SizedBox(
-                        width: 42,
-                        height: 42,
-                        child: ToTimeOfDay(
-                          timeStamp: widget.timeTaken,
-                        ),
-                      ),
-                      title: RichText(
-                        text: TextSpan(
-                          style: TextStyle(
-                            color: ThemeData.dark().scaffoldBackgroundColor,
-                          ),
-                          children: [
-                            TextSpan(
-                              text: "Taken ",
-                            ),
-                            TextSpan(
-                              text: DurationFormat.format(
-                                widget.timeSinceTaken,
-                                //settings
-                                len: 2,
-                                spaceBetween: true,
-                                //no big quants
-                                showYears: false,
-                                showMonths: false,
-                                showWeeks: false,
-                                //yes medium quants
-                                showDays: true,
-                                showHours: true,
-                                showMinutes: true,
-                                //no little quants
-                                showSeconds: false,
-                                showMilliseconds: false,
-                                showMicroseconds: false,
-                              ),
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            TextSpan(
-                              text: " ago",
-                            )
-                          ],
-                        ),
-                      ),
-                      subtitle: Text(
-                        "On " +
-                            DateTimeFormat.weekAndDay(
-                              widget.timeTaken,
-                            ),
-                      ),
-                      trailing: Text(
-                        widget.dose.round().toString(),
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    Visibility(
-                      visible: widget.isLast == false,
-                      child: ListTileDivider(),
-                    ),
-                  ],
+    Widget header = Material(
+      color: Colors.transparent,
+      child: Column(
+        children: <Widget>[
+          ListTile(
+            onTap: () {
+              isOpen.value = !isOpen.value;
+            },
+            leading: ToTimeOfDay(
+              timeStamp: widget.timeTaken,
+            ),
+            title: RichText(
+              text: TextSpan(
+                style: TextStyle(
+                  color: ThemeData.dark().scaffoldBackgroundColor,
                 ),
+                children: [
+                  TextSpan(
+                    text: "Taken ",
+                  ),
+                  TextSpan(
+                    text: DurationFormat.format(
+                      widget.timeSinceTaken,
+                      //settings
+                      len: 2,
+                      spaceBetween: true,
+                      //no big quants
+                      showYears: false,
+                      showMonths: false,
+                      showWeeks: false,
+                      //yes medium quants
+                      showDays: true,
+                      showHours: true,
+                      showMinutes: true,
+                      //no little quants
+                      showSeconds: false,
+                      showMilliseconds: false,
+                      showMicroseconds: false,
+                    ),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  TextSpan(
+                    text: " ago",
+                  )
+                ],
+              ),
+            ),
+            subtitle: Text(
+              "On " +
+                  DateTimeFormat.weekAndDay(
+                    widget.timeTaken,
+                  ),
+            ),
+            trailing: Text(
+              widget.dose.round().toString(),
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
               ),
             ),
           ),
-        );
+          Visibility(
+            visible: widget.isLast == false,
+            child: ListTileDivider(),
+          ),
+        ],
+      ),
+    );
 
-    Size tileSize = Size(
-          MediaQuery.of(context).size.width,
-          72.0 + 1, //height + size of divider
-        );
-
-
+    //used to scroll to the item on open
     return AutoScrollTag(
       controller: widget.autoScrollController,
       key: ValueKey(widget.id),
       index: widget.id,
-      child: Stack(
-        children: <Widget>[
-          
-          Transform.translate(
-            offset: Offset(tileSize.width, 0),
-            child: Transform(
-              transform: Matrix4Transform().flipHorizontally(
-                origin: Offset(0, 0)
-              ).matrix4,
-              child: SimpleFoldingCell(
-                key: _foldingCellKey,
-                
-                padding: EdgeInsets.all(0),
-                frontWidget: GestureDetector(
-                  onTap: () => _foldingCellKey?.currentState?.toggleFold(),
-                  child: Container(
-                        width: tileSize.width,
-                        height: tileSize.height,
-                        color: Colors.transparent,
-                      ),
-                ),
-                innerTopWidget: GestureDetector(
-                  onTap: () => _foldingCellKey?.currentState?.toggleFold(),
-                  child: Container(
-                        width: tileSize.width,
-                        height: tileSize.height,
-                        color: Colors.transparent,
-                      ),
-                ),
-                innerBottomWidget: GestureDetector(
-                  onTap: () => _foldingCellKey?.currentState?.toggleFold(),
-                  child: Container(
-                    width: tileSize.width,
-                    height: tileSize.height,
-                    color: Colors.red,
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        "hi",
-                        style: TextStyle(
-                          color: Colors.white,
+      child: Container(
+        color: Colors.red,
+        child: AnimatedBuilder(
+          animation: isOpen,
+          child: header,
+          builder: (context, child) {
+            //we only need to make the curve
+            //if we arent the last tile
+            bool curve = widget.isLast;
+            if (curve == false) {
+              curve = isOpen.value;
+            }
+
+            return Column(
+              children: <Widget>[
+                Stack(
+                  children: [
+                    Positioned(
+                      bottom: 0,
+                      child: AnimatedContainer(
+                        duration: animationDuration,
+                        transform: Matrix4.translation(
+                          vect.Vector3(
+                            0,
+                            isOpen.value ? 72 : 0,
+                            0,
+                          ),
+                        ),
+                        child: Container(
+                          color: widget.isLast
+                              ? ThemeData.dark().primaryColorDark
+                              : Colors.white,
+                          child: ClipRRect(
+                            /*
+                            borderRadius: BorderRadius.only(
+        topLeft: Radius.circular(widget.isFirst ? 24 : 0),
+        topRight: Radius.circular(widget.isFirst ? 24 : 0),
+        //doesnt show because of container that its in
+        //that animates the edges out if needed
+        bottomLeft: Radius.circular(24),
+        bottomRight: Radius.circular(24),
+      ),
+                            */
+                            borderRadius: BorderRadius.only(
+                              bottomLeft: Radius.circular(24),
+                              bottomRight: Radius.circular(24),
+                            ),
+                            child: Material(
+                              color: Colors.transparent,
+                              child: Container(
+                                height: 72,
+                                width: MediaQuery.of(context).size.width,
+                                color: ThemeData.dark().cardColor,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                     ),
-                  ),
+                    Positioned(
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      child: AnimatedContainer(
+                        duration: animationDuration,
+                        transform: Matrix4.translation(
+                          vect.Vector3(
+                            0,
+                            isOpen.value ? 12 : -36,
+                            0,
+                          ),
+                        ),
+                        height: 36,
+                        color: ThemeData.dark().cardColor,
+                      ),
+                    ),
+                    AnimatedContainer(
+                      duration: animationDuration,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(widget.isFirst ? 24 : 0),
+                          topRight: Radius.circular(widget.isFirst ? 24 : 0),
+                          bottomLeft: Radius.circular(curve ? 24 : 0),
+                          bottomRight: Radius.circular(curve ? 24 : 0),
+                        ),
+                      ),
+                      child: child,
+                    ),
+                  ],
                 ),
-                cellSize: tileSize,
-                animationDuration: Duration(milliseconds: 3000),
-                onOpen: () => print('cell opened'),
-                onClose: () => print('cell closed'),
-              ),
-            ),
-          ),
-          
-          
-          SizedBox(
-            width: tileSize.width,
-            height: tileSize.height,
-            child: header,
-          ),
-          
-        ],
+                //make space for the options comming from behind
+                AnimatedContainer(
+                  duration: animationDuration,
+                  height: isOpen.value ? 72 : 0,
+                ),
+              ],
+            );
+          },
+        ),
       ),
-    
-      
-      /*
-      Slidable(
-        actionPane: SlidableDrawerActionPane(),
-        actionExtentRatio: 0.25,
-        actions: <Widget>[
-          IconSlideAction(
-            caption: 'Archive',
-            color: Colors.blue,
-            icon: Icons.archive,
-            onTap: () {
-              print("more");
-            },
-          ),
-          IconSlideAction(
-            caption: 'Share',
-            color: Colors.indigo,
-            icon: Icons.share,
-            onTap: () {
-              print("more");
-            },
-          ),
-        ],
-        secondaryActions: <Widget>[
-          IconSlideAction(
-            caption: 'More',
-            color: Colors.black45,
-            icon: Icons.more_horiz,
-            onTap: () {
-              print("more");
-            },
-          ),
-          IconSlideAction(
-            caption: 'Delete',
-            color: Colors.red,
-            icon: Icons.delete,
-            onTap: () {
-              print("delete");
-            },
-          ),
-        ],
-        child: 
-      ),
-      */
     );
-    
   }
 }
 
