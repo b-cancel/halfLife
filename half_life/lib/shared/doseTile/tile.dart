@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:half_life/shared/tileDivider.dart';
 import 'package:half_life/utils/dateTimeFormat.dart';
 import 'package:half_life/utils/durationFormat.dart';
@@ -49,84 +50,109 @@ class _DoseTileState extends State<DoseTile> {
   maybeScrollHere() {
     widget.autoScrollController.scrollToIndex(
       widget.id,
-      preferPosition: AutoScrollPosition.begin,
+      preferPosition: AutoScrollPosition.middle,
     );
+  }
+
+  scrollToIfOpen() {
+    if (isOpen.value) {
+      //we are opening it
+      Future.delayed(animationDuration, () {
+        //we let it open
+        if (isOpen.value &&
+            widget.autoScrollController.isAutoScrolling == false) {
+          maybeScrollHere();
+        }
+      });
+    }
   }
 
   @override
   void initState() {
     super.initState();
+    isOpen.addListener(scrollToIfOpen);
+  }
+
+  @override
+  void dispose() {
+    isOpen.removeListener(scrollToIfOpen);
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    Widget header = Material(
-      color: Colors.transparent,
-      child: Column(
-        children: <Widget>[
-          ListTile(
-            onTap: () {
-              isOpen.value = !isOpen.value;
-            },
-            leading: ToTimeOfDay(
-              timeStamp: widget.timeTaken,
-            ),
-            title: RichText(
-              text: TextSpan(
-                style: TextStyle(
-                  color: ThemeData.dark().scaffoldBackgroundColor,
+    Widget header = ClipRRect(
+      borderRadius: BorderRadius.all(
+        Radius.circular(24),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: Column(
+          children: <Widget>[
+            ListTile(
+              onTap: () {
+                isOpen.value = !isOpen.value;
+              },
+              leading: ToTimeOfDay(
+                timeStamp: widget.timeTaken,
+              ),
+              title: RichText(
+                text: TextSpan(
+                  style: TextStyle(
+                    color: ThemeData.dark().scaffoldBackgroundColor,
+                  ),
+                  children: [
+                    TextSpan(
+                      text: "Taken ",
+                    ),
+                    TextSpan(
+                      text: DurationFormat.format(
+                        widget.timeSinceTaken,
+                        //settings
+                        len: 2,
+                        spaceBetween: true,
+                        //no big quants
+                        showYears: false,
+                        showMonths: false,
+                        showWeeks: false,
+                        //yes medium quants
+                        showDays: true,
+                        showHours: true,
+                        showMinutes: true,
+                        //no little quants
+                        showSeconds: false,
+                        showMilliseconds: false,
+                        showMicroseconds: false,
+                      ),
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    TextSpan(
+                      text: " ago",
+                    )
+                  ],
                 ),
-                children: [
-                  TextSpan(
-                    text: "Taken ",
-                  ),
-                  TextSpan(
-                    text: DurationFormat.format(
-                      widget.timeSinceTaken,
-                      //settings
-                      len: 2,
-                      spaceBetween: true,
-                      //no big quants
-                      showYears: false,
-                      showMonths: false,
-                      showWeeks: false,
-                      //yes medium quants
-                      showDays: true,
-                      showHours: true,
-                      showMinutes: true,
-                      //no little quants
-                      showSeconds: false,
-                      showMilliseconds: false,
-                      showMicroseconds: false,
+              ),
+              subtitle: Text(
+                "On " +
+                    DateTimeFormat.weekAndDay(
+                      widget.timeTaken,
                     ),
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  TextSpan(
-                    text: " ago",
-                  )
-                ],
+              ),
+              trailing: Text(
+                widget.dose.round().toString(),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
-            subtitle: Text(
-              "On " +
-                  DateTimeFormat.weekAndDay(
-                    widget.timeTaken,
-                  ),
+            Visibility(
+              visible: widget.isLast == false,
+              child: ListTileDivider(),
             ),
-            trailing: Text(
-              widget.dose.round().toString(),
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          Visibility(
-            visible: widget.isLast == false,
-            child: ListTileDivider(),
-          ),
-        ],
+          ],
+        ),
       ),
     );
 
@@ -135,106 +161,219 @@ class _DoseTileState extends State<DoseTile> {
       controller: widget.autoScrollController,
       key: ValueKey(widget.id),
       index: widget.id,
-      child: Container(
-        color: Colors.red,
-        child: AnimatedBuilder(
-          animation: isOpen,
-          child: header,
-          builder: (context, child) {
-            //we only need to make the curve
-            //if we arent the last tile
-            bool curve = widget.isLast;
-            if (curve == false) {
-              curve = isOpen.value;
-            }
+      child: AnimatedBuilder(
+        animation: isOpen,
+        child: header,
+        builder: (context, child) {
+          //we only need to make the curve
+          //if we arent the last tile
+          bool curve = widget.isLast;
+          if (curve == false) {
+            curve = isOpen.value;
+          }
 
-            return Column(
-              children: <Widget>[
-                Stack(
-                  children: [
-                    Positioned(
-                      bottom: 0,
-                      child: AnimatedContainer(
-                        duration: animationDuration,
-                        transform: Matrix4.translation(
-                          vect.Vector3(
-                            0,
-                            isOpen.value ? 72 : 0,
-                            0,
-                          ),
-                        ),
-                        child: Container(
-                          color: widget.isLast
-                              ? ThemeData.dark().primaryColorDark
-                              : Colors.white,
-                          child: ClipRRect(
-                            /*
-                            borderRadius: BorderRadius.only(
-        topLeft: Radius.circular(widget.isFirst ? 24 : 0),
-        topRight: Radius.circular(widget.isFirst ? 24 : 0),
-        //doesnt show because of container that its in
-        //that animates the edges out if needed
-        bottomLeft: Radius.circular(24),
-        bottomRight: Radius.circular(24),
+          return Column(
+            children: <Widget>[
+              Stack(
+                overflow: Overflow.clip,
+                children: [
+                  OptionsTranslator(
+                    isLast: widget.isLast,
+                    animationDuration: animationDuration,
+                    isOpen: isOpen,
+                  ),
+                  Corners(
+                    animationDuration: animationDuration,
+                    isOpen: isOpen,
+                  ),
+                  AnimatedContainer(
+                    duration: animationDuration,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(curve ? 24 : 0),
+                        bottomRight: Radius.circular(curve ? 24 : 0),
+                      ),
+                    ),
+                    child: child,
+                  ),
+                ],
+              ),
+              OptionsSpacer(
+                animationDuration: animationDuration,
+                isOpen: isOpen,
+              ),
+            ],
+          );
+        },
       ),
-                            */
-                            borderRadius: BorderRadius.only(
-                              bottomLeft: Radius.circular(24),
-                              bottomRight: Radius.circular(24),
-                            ),
-                            child: Material(
-                              color: Colors.transparent,
-                              child: Container(
-                                height: 72,
-                                width: MediaQuery.of(context).size.width,
-                                color: ThemeData.dark().cardColor,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
+    );
+  }
+}
+
+class OptionsTranslator extends StatelessWidget {
+  const OptionsTranslator({
+    Key key,
+    @required this.animationDuration,
+    @required this.isOpen,
+    @required this.isLast,
+  }) : super(key: key);
+
+  final Duration animationDuration;
+  final ValueNotifier<bool> isOpen;
+  final bool isLast;
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned(
+      bottom: 0,
+      child: AnimatedContainer(
+        duration: animationDuration,
+        transform: Matrix4.translation(
+          vect.Vector3(
+            0,
+            isOpen.value ? 72 : 0,
+            0,
+          ),
+        ),
+        child: Options(isLast: isLast),
+      ),
+    );
+  }
+}
+
+class Options extends StatelessWidget {
+  const Options({
+    Key key,
+    @required this.isLast,
+  }) : super(key: key);
+
+  final bool isLast;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: isLast ? ThemeData.dark().primaryColorDark : Colors.white,
+      child: ClipRRect(
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(24),
+          bottomRight: Radius.circular(24),
+        ),
+        child: Material(
+          color: ThemeData.dark().cardColor,
+          child: Container(
+            height: 72,
+            width: MediaQuery.of(context).size.width,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(
+                  child: IconButton(
+                    icon: Icon(
+                      FontAwesomeIcons.pills,
+                      color: Theme.of(context).accentColor,
                     ),
-                    Positioned(
-                      bottom: 0,
-                      left: 0,
-                      right: 0,
-                      child: AnimatedContainer(
-                        duration: animationDuration,
-                        transform: Matrix4.translation(
-                          vect.Vector3(
-                            0,
-                            isOpen.value ? 12 : -36,
-                            0,
-                          ),
-                        ),
-                        height: 36,
-                        color: ThemeData.dark().cardColor,
-                      ),
-                    ),
-                    AnimatedContainer(
-                      duration: animationDuration,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(widget.isFirst ? 24 : 0),
-                          topRight: Radius.circular(widget.isFirst ? 24 : 0),
-                          bottomLeft: Radius.circular(curve ? 24 : 0),
-                          bottomRight: Radius.circular(curve ? 24 : 0),
-                        ),
-                      ),
-                      child: child,
-                    ),
-                  ],
+                    onPressed: () {},
+                  ),
                 ),
-                //make space for the options comming from behind
-                AnimatedContainer(
-                  duration: animationDuration,
-                  height: isOpen.value ? 72 : 0,
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                    vertical: 12,
+                  ),
+                  child: Container(
+                    color: ThemeData.dark().primaryColorLight,
+                    width: 1,
+                  ),
+                ),
+                Expanded(
+                  child: IconButton(
+                    icon: Icon(
+                      Icons.calendar_today,
+                      color: Colors.white,
+                    ),
+                    onPressed: () {},
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                    vertical: 12,
+                  ),
+                  child: Container(
+                    color: ThemeData.dark().primaryColorLight,
+                    width: 1,
+                  ),
+                ),
+                Expanded(
+                  child: IconButton(
+                    icon: Icon(
+                      Icons.delete,
+                      color: Colors.red,
+                      size: 36,
+                    ),
+                    onPressed: () {
+                      print("delete");
+                    },
+                  ),
                 ),
               ],
-            );
-          },
+            ),
+          ),
         ),
+      ),
+    );
+  }
+}
+
+class OptionsSpacer extends StatelessWidget {
+  const OptionsSpacer({
+    Key key,
+    @required this.animationDuration,
+    @required this.isOpen,
+  }) : super(key: key);
+
+  final Duration animationDuration;
+  final ValueNotifier<bool> isOpen;
+
+  @override
+  Widget build(BuildContext context) {
+    return IgnorePointer(
+      ignoring: true,
+      child: AnimatedContainer(
+        color: Colors.transparent,
+        duration: animationDuration,
+        height: isOpen.value ? 72 : 0,
+      ),
+    );
+  }
+}
+
+class Corners extends StatelessWidget {
+  const Corners({
+    Key key,
+    @required this.animationDuration,
+    @required this.isOpen,
+  }) : super(key: key);
+
+  final Duration animationDuration;
+  final ValueNotifier<bool> isOpen;
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned(
+      bottom: 0,
+      left: 0,
+      right: 0,
+      child: AnimatedContainer(
+        duration: animationDuration,
+        transform: Matrix4.translation(
+          vect.Vector3(
+            0,
+            isOpen.value ? 0 : -24,
+            0,
+          ),
+        ),
+        height: 36,
+        color: ThemeData.dark().cardColor,
       ),
     );
   }
