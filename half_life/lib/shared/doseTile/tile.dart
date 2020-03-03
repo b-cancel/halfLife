@@ -24,6 +24,7 @@ class DoseTile extends StatefulWidget {
     //for selected date time
     @required this.theSelectedDateTime,
     @required this.autoScrollController,
+    @required this.othersCloseOnToggle,
   }) : super(key: key);
 
   final int id;
@@ -38,12 +39,14 @@ class DoseTile extends StatefulWidget {
 
   final ValueNotifier<DateTime> theSelectedDateTime;
   final AutoScrollController autoScrollController;
+  final ValueNotifier<bool> othersCloseOnToggle;
 
   @override
   _DoseTileState createState() => _DoseTileState();
 }
 
 class _DoseTileState extends State<DoseTile> {
+  bool weWillOpen = false;
   final ValueNotifier<bool> isOpen = new ValueNotifier<bool>(false);
   final Duration animationDuration = Duration(milliseconds: 300);
 
@@ -55,8 +58,7 @@ class _DoseTileState extends State<DoseTile> {
   }
 
   scrollToIfOpen() {
-    if (isOpen.value) {
-      //we are opening it
+    if (isOpen.value) { //we are opening it
       Future.delayed(animationDuration, () {
         //we let it open
         if (isOpen.value &&
@@ -67,14 +69,27 @@ class _DoseTileState extends State<DoseTile> {
     }
   }
 
+  maybeClose(){
+    //we toggle it so we stay open
+    if(weWillOpen){
+      weWillOpen = false;
+      isOpen.value = true;
+    }
+    else{ //someone else toggle it so we close
+      isOpen.value = false;
+    } 
+  }
+
   @override
   void initState() {
     super.initState();
     isOpen.addListener(scrollToIfOpen);
+    widget.othersCloseOnToggle.addListener(maybeClose);
   }
 
   @override
   void dispose() {
+    widget.othersCloseOnToggle.removeListener(maybeClose);
     isOpen.removeListener(scrollToIfOpen);
     super.dispose();
   }
@@ -91,7 +106,12 @@ class _DoseTileState extends State<DoseTile> {
           children: <Widget>[
             ListTile(
               onTap: () {
-                isOpen.value = !isOpen.value;
+                //we are trying to open oursleves
+                if(isOpen.value == false){
+                  weWillOpen = true;
+                  widget.othersCloseOnToggle.value = !widget.othersCloseOnToggle.value;
+                } //closing ourselves means we are the only open ones
+                else isOpen.value = false;
               },
               leading: ToTimeOfDay(
                 timeStamp: widget.timeTaken,

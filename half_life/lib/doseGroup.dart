@@ -7,22 +7,30 @@ import 'package:half_life/struct/doses.dart';
 import 'package:half_life/utils/dateTimeFormat.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 
+
 //everything
 class DoseGroup extends StatelessWidget {
   DoseGroup({
-    @required this.group,
-    @required this.lastGroup,
+    //open close
+    @required this.otherCloseOnToggle,
+    @required this.autoScrollController,
+    //inner
     @required this.lastDateTime,
     @required this.theSelectedDateTime,
-    @required this.autoScrollController,
+    @required this.lastGroup,
+    @required this.group,
   });
 
-  final List<Dose> group;
-  final bool lastGroup;
+  //open close
+  final ValueNotifier<bool> otherCloseOnToggle;
+  final AutoScrollController autoScrollController;
+  //inner
   final ValueNotifier<DateTime> lastDateTime;
   final ValueNotifier<DateTime> theSelectedDateTime;
-  final AutoScrollController autoScrollController;
+  final List<Dose> group;
+  final bool lastGroup;
 
+  //build
   @override
   Widget build(BuildContext context) {
     //grab header info
@@ -88,6 +96,7 @@ class DoseGroup extends StatelessWidget {
                   timeSinceTaken: lastDateTime.value.difference(timeTaken),
                   theSelectedDateTime: theSelectedDateTime,
                   autoScrollController: autoScrollController,
+                  othersCloseOnToggle: otherCloseOnToggle,
                 ),
               ],
             ),

@@ -29,6 +29,10 @@ class DosesRefresh extends StatefulWidget {
 }
 
 class _DosesRefreshState extends State<DosesRefresh> {
+  final ValueNotifier<bool> othersCloseOnToggle = new ValueNotifier<bool>(false);
+
+  //-------------------------For Dose Selection (test autoscroll)
+
   final ValueNotifier<DateTime> theSelectedDateTime = new ValueNotifier<DateTime>(
     DateTime.now(), //immediately overriden
   );
@@ -100,6 +104,7 @@ class _DosesRefreshState extends State<DosesRefresh> {
           lastGroup: i == (doseGroups.length - 1),
           theSelectedDateTime: theSelectedDateTime,
           lastDateTime: lastDateTime,
+          otherCloseOnToggle: othersCloseOnToggle,
           autoScrollController: widget.autoScrollController,
         ),
       );
