@@ -31,7 +31,7 @@ class DateTimeFormat{
     else return "th";
   }
   
-  static String weekAndDay(DateTime dateTime){
+  static String weekAndDay(DateTime dateTime){ 
     String weekStr = weekDayToString[dateTime.weekday];
     String dayStr = dateTime.day.toString();
     dayStr += daySuffix(dateTime.day);

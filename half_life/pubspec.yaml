@@ -36,11 +36,14 @@ dependencies:
   scroll_to_index: ^1.0.5
   flutter_rounded_date_picker: ^1.0.3
   flutter_gifimage: ^1.0.1 
+  animator: ^1.0.0+5
 
   #test
   flutter_villains: ^1.2.1
   configurable_expansion_tile: ^1.0.0
   matrix4_transform: ^1.1.3
+  sleek_circular_slider: ^1.0.7
+  flutter_circular_slider: ^2.5.0
 
 dev_dependencies:
   flutter_test:

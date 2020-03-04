@@ -165,9 +165,11 @@ class MyApp extends StatelessWidget {
       ],
       theme: ThemeData.light().copyWith(
         accentColor: Color(0xFF64ffda),
+        textSelectionColor: ThemeData.dark().cardColor,
+        //NOTE: you can only set this once aparently
+        textSelectionHandleColor: Colors.white,
       ),
       home: DosesBody(
-        halfLife: Duration(hours: 36),
         doses: doses,
       ),
     );

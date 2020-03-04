@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:half_life/doseChart.dart';
+import 'package:half_life/halfLifeChanger.dart';
 import 'package:half_life/struct/doses.dart';
 
-class HeaderSliver extends StatelessWidget {
+class HeaderSliver extends StatefulWidget {
   const HeaderSliver({
     Key key,
     @required this.theSelectedDateTime,
@@ -11,7 +12,6 @@ class HeaderSliver extends StatelessWidget {
     @required this.statusBarHeight,
     @required this.lastDateTime,
     @required this.doses,
-    @required this.halfLife,
   }) : super(key: key);
 
   final ValueNotifier<DateTime> theSelectedDateTime;
@@ -20,8 +20,23 @@ class HeaderSliver extends StatelessWidget {
   final double statusBarHeight;
   final ValueNotifier<DateTime> lastDateTime;
   final List<Dose> doses;
-  final Duration halfLife;
 
+  @override
+  _HeaderSliverState createState() => _HeaderSliverState();
+}
+
+class _HeaderSliverState extends State<HeaderSliver> {
+  //eventually object updaters
+  final TextEditingController textCtrl = new TextEditingController(text: "Fluvoxamine");
+
+  final ValueNotifier<Duration> halfLife = ValueNotifier<Duration>(
+    Duration(
+      //36 to 60
+      hours: 48,
+    ),
+  );
+
+  //build
   @override
   Widget build(BuildContext context) {
     return SliverAppBar(
@@ -46,7 +61,7 @@ class HeaderSliver extends StatelessWidget {
       bottom: PreferredSize(
         preferredSize: Size(
           MediaQuery.of(context).size.width,
-          bottomBarHeight,
+          widget.bottomBarHeight,
         ),
         child: Material(
           color: Colors.transparent,
@@ -72,7 +87,7 @@ class HeaderSliver extends StatelessWidget {
         ),
       ),
       //most of the screen
-      expandedHeight: chartHeight,
+      expandedHeight: widget.chartHeight,
       //the graph
       flexibleSpace: FlexibleSpaceBar(
         //scaling title
@@ -115,11 +130,11 @@ class HeaderSliver extends StatelessWidget {
               ),
             ),
             Container(
-              height: chartHeight,
+              height: widget.chartHeight,
               width: MediaQuery.of(context).size.width,
               padding: EdgeInsets.only(
-                top: statusBarHeight,
-                bottom: bottomBarHeight,
+                top: widget.statusBarHeight,
+                bottom: widget.bottomBarHeight,
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.max,
@@ -137,11 +152,21 @@ class HeaderSliver extends StatelessWidget {
                         //give the edit half life button space
                         centerTitle: false,
                         //medication name
-                        title: Text(
-                          "Fluvoxamine",
+                        title: TextField(
+                          controller: textCtrl,
                           style: TextStyle(
                             color: Theme.of(context).accentColor,
+                            fontSize: 18,
                           ),
+                          cursorColor: Colors.white,
+                          decoration: InputDecoration(
+                            border: InputBorder.none,
+                            hintText: 'Medication Name',
+                          ),
+                          //only 1 line at all times
+                          expands: false, 
+                          minLines: 1,
+                          maxLines: 1,
                         ),
                         //change half life name
                         actions: <Widget>[
@@ -150,85 +175,8 @@ class HeaderSliver extends StatelessWidget {
                               horizontal: 8,
                               vertical: 8,
                             ),
-                            child: OutlineButton(
-                              highlightedBorderColor: Theme.of(context).accentColor,
-                              borderSide: BorderSide(
-                                color: ThemeData.dark().cardColor,
-                              ),
-                              padding: EdgeInsets.all(0),
-                              child: DefaultTextStyle(
-                                style: TextStyle(
-                                  color: Theme.of(context).accentColor,
-                                ),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: <Widget>[
-                                    Padding(
-                                      padding: EdgeInsets.only(
-                                        left: 12.0,
-                                        right: 8,
-                                      ),
-                                      child: Text("36hrs"),
-                                    ),
-                                    Container(
-                                      color: Theme.of(context).accentColor,
-                                      height: 56.0 - (8 * 2),
-                                      width: 36,
-                                      padding: EdgeInsets.only(
-                                        right: 12,
-                                        left: 8,
-                                      ),
-                                      child: Transform.translate(
-                                        offset: Offset(12.0, 4),
-                                        child: DefaultTextStyle(
-                                          style: TextStyle(
-                                            color: ThemeData.dark().scaffoldBackgroundColor,
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                          child: Stack(
-                                            children: <Widget>[
-                                              Transform.translate(
-                                                offset: Offset(-12, -4),
-                                                child: Text(
-                                                  "t",
-                                                  style: TextStyle(
-                                                    fontSize: 26,
-                                                  ),
-                                                ),
-                                              ),
-                                              Transform.translate(
-                                                offset: Offset(0, 6),
-                                                child: Stack(
-                                                  children: [
-                                                    Transform.translate(
-                                                      offset: Offset(0, 0),
-                                                      child: Text(
-                                                        "1",
-                                                      ),
-                                                    ),
-                                                    Transform.translate(
-                                                      offset: Offset(0, 0),
-                                                      child: Text("_"),
-                                                    ),
-                                                    Transform.translate(
-                                                      offset: Offset(0, 12),
-                                                      child: Text("2"),
-                                                    ),
-                                                  ]
-                                                ),
-                                              )
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              onPressed: () {
-                                print("change active dose");
-                              },
+                            child: HalfLifeChanger(
+                              halfLife: halfLife,
                             ),
                           ),
                         ],
@@ -239,11 +187,11 @@ class HeaderSliver extends StatelessWidget {
                     child: Container(
                       color: Theme.of(context).accentColor,
                       child: HeaderChart(
-                        lastDateTime: lastDateTime,
-                        theSelectedDateTime: theSelectedDateTime,
+                        lastDateTime: widget.lastDateTime,
+                        theSelectedDateTime: widget.theSelectedDateTime,
                         screenWidth: MediaQuery.of(context).size.width,
-                        halfLife: halfLife,
-                        doses: doses,
+                        halfLife: halfLife.value,
+                        doses: widget.doses,
                       ),
                     ),
                   ),

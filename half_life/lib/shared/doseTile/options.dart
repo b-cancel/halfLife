@@ -4,14 +4,17 @@ import 'package:flutter_rounded_date_picker/src/material_rounded_date_picker_sty
 import 'package:flutter_rounded_date_picker/src/material_rounded_year_picker_style.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:half_life/shared/playOnceGif.dart';
+import 'package:half_life/utils/dateTimeFormat.dart';
 
 class Options extends StatelessWidget {
   const Options({
     Key key,
+    @required this.dose,
     @required this.initialDate,
     @required this.isLast,
   }) : super(key: key);
 
+  final double dose;
   final DateTime initialDate;
   final bool isLast;
 
@@ -38,7 +41,7 @@ class Options extends StatelessWidget {
                       FontAwesomeIcons.pills,
                       color: Theme.of(context).accentColor,
                     ),
-                    onPressed: () {
+                    onPressed: (){
                       print("change dosage");
                     },
                   ),
@@ -195,16 +198,81 @@ class Options extends StatelessWidget {
                                     child: DefaultTextStyle(
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
-                                        fontSize: 24,
+                                        fontSize: 26,
                                         color: Colors.black,
                                       ),
-                                      child: Text("Delete Dose?"),
+                                      child: Text("Delete The Dose?"),
                                     ),
                                   ),
                                 ),
                                 Padding(
-                                  padding: const EdgeInsets.all(24.0),
-                                  child: Text("message"),
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 24.0,
+                                  ),
+                                  child: Padding(
+                                    padding: EdgeInsets.only(
+                                      top: 8.0,
+                                      bottom: 16,
+                                    ),
+                                    child: Column(
+                                      children: <Widget>[
+                                        Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Stack(
+                                          children: <Widget>[
+                                            RichText(
+                                              text: TextSpan(
+                                                style: TextStyle(
+                                                  color: ThemeData.dark().scaffoldBackgroundColor,
+                                                  fontSize: 18,
+                                                ),
+                                                children: [
+                                                  TextSpan(
+                                                    text: "Of ",
+                                                  ),
+                                                  TextSpan(
+                                                    text: dose.round().toString(),
+                                                    style: TextStyle(
+                                                      fontWeight: FontWeight.bold,
+                                                      fontSize: 24,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            Positioned(
+                                              right: 0,
+                                              bottom: 0,
+                                              child: Transform.translate(
+                                                offset: Offset(8, 2),
+                                                child: Text(
+                                                  "u",
+                                                  style: TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        Text(
+                                          "   taken on",
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                          ),
+                                        ),
+                                          ],
+                                        ),
+                                        
+                                        WeekDayYear(
+                                          dateTime: initialDate,
+                                          showYear: true,
+                                        ),
+                                        
+                                      ],
+                                    ),
+                                  )
                                 ),
                               ],
                             ),
@@ -214,7 +282,7 @@ class Options extends StatelessWidget {
                                   Navigator.of(context).pop();
                                 },
                                 child: Text(
-                                  "Don't Delete",
+                                  "Cancel",
                                   style: TextStyle(
                                     color: ThemeData.dark().scaffoldBackgroundColor,
                                   ),
@@ -243,6 +311,61 @@ class Options extends StatelessWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class WeekDayYear extends StatelessWidget {
+  const WeekDayYear({
+    Key key,
+    @required this.dateTime,
+    this.showYear: false,
+  }) : super(key: key);
+
+  final DateTime dateTime;
+  final bool showYear;
+
+  @override
+  Widget build(BuildContext context) {
+    TextStyle bold = TextStyle(
+      fontWeight: FontWeight.bold,
+    );
+
+    //build
+    return RichText(
+      text: TextSpan(
+        style: TextStyle(
+          color: ThemeData.dark().scaffoldBackgroundColor,
+          fontSize: showYear ? null : 16,
+        ),
+        children: [
+          TextSpan(
+            text: DateTimeFormat.weekDayToString[
+              dateTime.weekday
+            ],
+            style: bold,
+          ),
+          TextSpan(
+            text: " the ",
+          ),
+          TextSpan(
+            text: dateTime.day.toString(),
+            style: bold,
+          ),
+          TextSpan(
+            text: DateTimeFormat.daySuffix(
+              dateTime.day,
+            ),
+          ),
+          TextSpan(
+            text: showYear ? ", " : "",
+          ),
+          TextSpan(
+            text: showYear ? dateTime.year.toString() : "",
+            style: bold,
+          ),
+        ]
       ),
     );
   }

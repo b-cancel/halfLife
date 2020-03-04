@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -8,6 +9,7 @@ import 'package:half_life/utils/dateTimeFormat.dart';
 import 'package:half_life/utils/durationFormat.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 import 'package:vector_math/vector_math_64.dart' as vect;
+import 'package:animator/animator.dart';
 
 class DoseTile extends StatefulWidget {
   const DoseTile({
@@ -60,7 +62,8 @@ class _DoseTileState extends State<DoseTile> {
   }
 
   scrollToIfOpen() {
-    if (isOpening.value) { //we are opening it
+    if (isOpening.value) {
+      //we are opening it
       Future.delayed(animationDuration, () {
         //we let it open
         if (isOpening.value &&
@@ -71,15 +74,15 @@ class _DoseTileState extends State<DoseTile> {
     }
   }
 
-  maybeClose(){
+  maybeClose() {
     //we toggle it so we stay open
-    if(weWillOpen){
+    if (weWillOpen) {
       weWillOpen = false;
       isOpening.value = true;
-    }
-    else{ //someone else toggle it so we close
+    } else {
+      //someone else toggle it so we close
       isOpening.value = false;
-    } 
+    }
   }
 
   @override
@@ -98,6 +101,8 @@ class _DoseTileState extends State<DoseTile> {
 
   @override
   Widget build(BuildContext context) {
+    double activeDoseAfter = 123;
+
     Widget header = ClipRRect(
       borderRadius: BorderRadius.all(
         Radius.circular(24),
@@ -109,68 +114,41 @@ class _DoseTileState extends State<DoseTile> {
             ListTile(
               onTap: () {
                 //we are trying to open oursleves
-                if(isOpening.value == false){
+                if (isOpening.value == false) {
                   weWillOpen = true;
-                  widget.othersCloseOnToggle.value = !widget.othersCloseOnToggle.value;
+                  widget.othersCloseOnToggle.value =
+                      !widget.othersCloseOnToggle.value;
                   //NOTE: this will cause isOpening to be updated to true
                   //only for us becuase of weWillOpen being set to true
-                } 
-                else{ //closing ourselves means we are the only open ones
+                } else {
+                  //closing ourselves means we are the only open ones
                   isOpening.value = false;
                 }
               },
               leading: ToTimeOfDay(
                 timeStamp: widget.timeTaken,
               ),
-              title: RichText(
-                text: TextSpan(
-                  style: TextStyle(
-                    color: ThemeData.dark().scaffoldBackgroundColor,
+              title: Row(
+                children: [
+                  Text(
+                    "Taken on ",
+                    style: TextStyle(
+                      fontSize: 16,
+                    ),
                   ),
-                  children: [
-                    TextSpan(
-                      text: "Taken ",
-                    ),
-                    TextSpan(
-                      text: DurationFormat.format(
-                        widget.timeSinceTaken,
-                        //settings
-                        len: 2,
-                        spaceBetween: true,
-                        //no big quants
-                        showYears: false,
-                        showMonths: false,
-                        showWeeks: false,
-                        //yes medium quants
-                        showDays: true,
-                        showHours: true,
-                        showMinutes: true,
-                        //no little quants
-                        showSeconds: false,
-                        showMilliseconds: false,
-                        showMicroseconds: false,
-                      ),
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    TextSpan(
-                      text: " ago",
-                    )
-                  ],
-                ),
+                  WeekDayYear(
+                    dateTime: widget.timeTaken,
+                  ),
+                ],
               ),
-              subtitle: Text(
-                "On " +
-                    DateTimeFormat.weekAndDay(
-                      widget.timeTaken,
-                    ),
+              subtitle: PillSubtitle(
+                activeDoseAfter: activeDoseAfter,
+                dose: widget.dose,
               ),
-              trailing: Text(
-                widget.dose.round().toString(),
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                ),
+              trailing: RotatingIcon(
+                color: ThemeData.dark().scaffoldBackgroundColor, 
+                duration: animationDuration,
+                isOpen: isOpening,
               ),
             ),
             Visibility(
@@ -227,6 +205,7 @@ class _DoseTileState extends State<DoseTile> {
                 height: isOpening.value ? 72 : 0,
                 child: Center(
                   child: Options(
+                    dose: widget.dose,
                     initialDate: widget.timeTaken,
                     isLast: widget.isLast,
                   ),
@@ -236,6 +215,97 @@ class _DoseTileState extends State<DoseTile> {
           );
         },
       ),
+    );
+  }
+}
+
+class PillSubtitle extends StatelessWidget {
+  const PillSubtitle({
+    Key key,
+    @required this.activeDoseAfter,
+    @required this.dose,
+  }) : super(key: key);
+
+  final double activeDoseAfter;
+  final double dose;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Text(
+          (activeDoseAfter - dose).round().toString(),
+        ),
+        Icon(
+          Icons.arrow_right,
+        ),
+        ClipRRect(
+          borderRadius: BorderRadius.all(
+            Radius.circular(10),
+          ),
+          child: Container(
+            height: 20,
+            child: Row(
+              children: [
+                Container(
+                  width: 16,
+                  color: ThemeData.dark().primaryColorLight,
+                ),
+                Container(
+                  color: Theme.of(context).accentColor,
+                  alignment: Alignment.center,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 8,
+                  ),
+                  child: Container(
+                    padding: EdgeInsets.only(
+                      right: 10,
+                    ),
+                    child: DefaultTextStyle(
+                      style: TextStyle(
+                        color: ThemeData.dark().scaffoldBackgroundColor,
+                      ),
+                      child: Stack(
+                        children: [
+                          Text(
+                            dose.round().toString(),
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Positioned(
+                            right: 0,
+                            bottom: 0,
+                            child: Transform.translate(
+                              offset: Offset(8, 2),
+                              child: Text(
+                                "u",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                Container(
+                  width: 16,
+                  color: ThemeData.dark().scaffoldBackgroundColor,
+                ),
+              ],
+            ),
+          ),
+        ),
+        Icon(
+          Icons.arrow_right,
+        ),
+        Text(
+          activeDoseAfter.round().toString(),
+        ),
+      ],
     );
   }
 }
@@ -267,6 +337,77 @@ class Corners extends StatelessWidget {
         ),
         height: 36,
         color: ThemeData.dark().cardColor,
+      ),
+    );
+  }
+}
+
+class RotatingIcon extends StatefulWidget {
+  RotatingIcon({
+    @required this.color,
+    @required this.duration,
+    @required this.isOpen,
+  });
+
+  //passed params
+  final Color color;
+  final Duration duration;
+  final ValueNotifier<bool> isOpen;
+
+  @override
+  _RotatingIconState createState() => _RotatingIconState();
+}
+
+class _RotatingIconState extends State<RotatingIcon> {
+  final ValueNotifier<double> tweenBeginning = new ValueNotifier<double>(-1);
+  final ValueNotifier<double> fractionOfDuration = new ValueNotifier<double>(1);
+  final double normalRotation = 0;
+  final double otherRotation = (-math.pi / 4) * 4;
+
+  updateState(){
+    if(mounted){
+      setState(() {});
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    widget.isOpen.addListener(updateState);
+  }
+  
+  @override
+  void dispose() { 
+    widget.isOpen.removeListener(updateState);
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Animator<double>(
+      resetAnimationOnRebuild: true,
+      tween: widget.isOpen.value
+        ? Tween<double>(
+            begin: tweenBeginning.value == -1 ? normalRotation : tweenBeginning.value, 
+            end: otherRotation,
+        )
+        : Tween<double>(
+            begin: tweenBeginning.value == -1 ? otherRotation : tweenBeginning.value, 
+            end: normalRotation,
+        ),
+      duration: Duration(
+        milliseconds: ((widget.duration.inMilliseconds * fractionOfDuration.value).toInt()),
+      ),
+      customListener: (animator) {
+        tweenBeginning.value = animator.animation.value;
+        fractionOfDuration.value = animator.controller.value;
+      },
+      builder: (anim) => Transform.rotate(
+        angle: anim.value,
+        child: Icon(
+          Icons.keyboard_arrow_down,
+          color: widget.color,
+        ),
       ),
     );
   }

@@ -16,12 +16,10 @@ import 'package:half_life/doseGroup.dart';
 class DosesRefresh extends StatefulWidget {
   DosesRefresh({
     @required this.autoScrollController,
-    @required this.halfLife,
     @required this.doses,
   });
 
   final AutoScrollController autoScrollController;
-  final Duration halfLife;
   final List<Dose> doses;
 
   @override
@@ -29,6 +27,8 @@ class DosesRefresh extends StatefulWidget {
 }
 
 class _DosesRefreshState extends State<DosesRefresh> {
+  //-------------------------only allows one dose flyout to be open an once
+
   final ValueNotifier<bool> othersCloseOnToggle = new ValueNotifier<bool>(false);
 
   //-------------------------For Dose Selection (test autoscroll)
@@ -92,7 +92,6 @@ class _DosesRefreshState extends State<DosesRefresh> {
       statusBarHeight: statusBarHeight, 
       lastDateTime: lastDateTime, 
       doses: widget.doses,
-      halfLife: widget.halfLife,
     );
 
     //generate group widgets

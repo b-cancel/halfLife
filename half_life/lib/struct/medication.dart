@@ -1,9 +1,4 @@
-//internal
-import 'package:half_life/struct/data.dart';
-
-//class
 class AMedication{
-  //NOTE: this is saved by the addExcercise function
   int id;
 
   //medication name
@@ -35,6 +30,14 @@ class AMedication{
   int get highestDose => _highestDose;
   set highestDose(int newHighestDose){
     _highestDose = newHighestDose;
+    //Medications.updateFile();
+  }
+
+  //highest dose
+  int _lowestDose;
+  int get lowestDose => _lowestDose;
+  set lowestDose(int newLowestDose){
+    _lowestDose = newLowestDose;
     //Medications.updateFile();
   }
 

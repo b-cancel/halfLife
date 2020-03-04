@@ -28,19 +28,3 @@ class Dose{
     this.timeStamp = timeStamp;
   }
 }
-
-/*
-//one created for each pixel in the width
-class DosePoint{
-  int pointID;
-  double dosage;
-
-  DosePoint(
-    int pointID,
-    double dosage,
-  ){
-    this.pointID = pointID;
-    this.dosage = dosage;
-  }
-}
-*/

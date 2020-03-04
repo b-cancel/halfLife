@@ -13,11 +13,9 @@ import 'package:half_life/doseRefresh.dart';
 class DosesBody extends StatefulWidget {
   DosesBody({
     @required this.doses,
-    @required this.halfLife,
   });
 
   final List<Dose> doses;
-  final Duration halfLife;
 
   @override
   _DosesBodyState createState() => _DosesBodyState();
@@ -73,7 +71,6 @@ class _DosesBodyState extends State<DosesBody> {
         children: <Widget>[
           DosesRefresh(
             autoScrollController: scrollController,
-            halfLife: widget.halfLife,
             doses: widget.doses,
           ),
           ScrollToTopButton(
