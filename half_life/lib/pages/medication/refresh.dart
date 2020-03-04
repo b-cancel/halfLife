@@ -1,3 +1,6 @@
+//dart
+import 'dart:math' as math;
+
 //flutter
 import 'package:flutter/material.dart';
 
@@ -28,6 +31,10 @@ class RefreshPage extends StatefulWidget {
 }
 
 class _RefreshPageState extends State<RefreshPage> {
+  final ValueNotifier<Duration> halfLife = new ValueNotifier<Duration>(Duration.zero);
+  final ValueNotifier<List<Dose>> dosesVN = new ValueNotifier(new List<Dose>());
+  final ValueNotifier<List<double>> activeDosesVN = new ValueNotifier(new List<double>());
+
   //-------------------------only allows one dose flyout to be open an once
 
   final ValueNotifier<bool> othersCloseOnToggle = new ValueNotifier<bool>(false);
@@ -56,8 +63,14 @@ class _RefreshPageState extends State<RefreshPage> {
   //everything updated at once
   updateDateTime() {
     lastDateTime.value = DateTime.now();
+    updateState();
+  }
+
+  updateState(){
     updateGroups();
-    if (mounted) setState(() {});
+    if (mounted){
+      setState(() {});
+    }
   }
 
   //-------------------------Init / Dispose
@@ -69,6 +82,21 @@ class _RefreshPageState extends State<RefreshPage> {
 
     //initially select DT is now
     theSelectedDateTime.value = lastDateTime.value;
+
+    //fill notifier and listen to changes to update stuff
+    dosesVN.value = widget.medication.doses;
+    dosesVN.addListener(updateState);
+
+    //ditto for half life
+    halfLife.value = widget.medication.halfLife;
+    halfLife.addListener(updateState);
+  }
+
+  @override
+  void dispose() { 
+    dosesVN.removeListener(updateState);
+    halfLife.removeListener(updateState);
+    super.dispose();
   }
 
   //-------------------------Widget Builders
@@ -84,7 +112,7 @@ class _RefreshPageState extends State<RefreshPage> {
     double statusBarHeight = MediaQuery.of(context).padding.top;
     double bottomBarHeight = 36;
     double screenHeight = MediaQuery.of(context).size.height;
-    chartHeight = measurementToGoldenRatioBS(screenHeight)[0];
+    double chartHeight = measurementToGoldenRatioBS(screenHeight)[0];
 
     //create app bar
     Widget sliverAppBar = HeaderSliver(
@@ -95,7 +123,7 @@ class _RefreshPageState extends State<RefreshPage> {
       //updated when messing with sliver
       theSelectedDateTime: theSelectedDateTime,
       //data
-      medication: widget.medication,
+      dosesVN: dosesVN,
     );
 
     //generate group widgets
@@ -176,9 +204,7 @@ class _RefreshPageState extends State<RefreshPage> {
     );
   }
 
-  //update before settings state
-  //seperated from build to stop unecesary reloads
-  double chartHeight;
+  //dose groups
   List<List<Dose>> doseGroups;
   updateGroups() {
     //group doses into months (so we don't have to repeat it)
@@ -189,16 +215,16 @@ class _RefreshPageState extends State<RefreshPage> {
     else doseGroups.clear();
 
     //the doses that we just took go on top
-    widget.medication.doses.sort((a, b) => a.compareTo(b));
+    dosesVN.value.sort((a, b) => a.compareTo(b));
 
     //NOTE: must use month AND year to be safe
     int doseMonth = -1;
     int doseYear = -1;
 
     //create groups
-    for (int i = 0; i < widget.medication.doses.length; i++) {
+    for (int i = 0; i < dosesVN.value.length; i++) {
       //extract dose properties
-      Dose thisDose = widget.medication.doses[i];
+      Dose thisDose = dosesVN.value[i];
       int thisMonth = thisDose.timeStamp.month;
       int thisYear = thisDose.timeStamp.year;
       bool sameMonth = thisMonth == doseMonth;
@@ -216,5 +242,39 @@ class _RefreshPageState extends State<RefreshPage> {
       //add dose to last group
       doseGroups.last.add(thisDose);
     }
+
+    //calculate how the active dose after every dose
+    List<double> newActiveDoses = new List<double>(dosesVN.value.length);
+    if(dosesVN.value.length > 1){
+      //set init values
+      int lastDoseIndex = (dosesVN.value.length - 1);
+      newActiveDoses[lastDoseIndex] = dosesVN.value[lastDoseIndex].value;
+      
+      //iterate through all other doses
+      for(int i = (lastDoseIndex - 1); i >= 0; i--){
+        //grab last data
+        int lastIndex = i + 1;
+        DateTime lastDoseTimestamp = dosesVN.value[lastIndex].timeStamp;
+        double lastActiveDose = newActiveDoses[lastIndex];
+
+        //grab this data
+        Dose thisDose = dosesVN.value[i];
+        double thisValue = thisDose.value;
+        DateTime thisDoseTimestamp = thisDose.timeStamp;
+
+        //determine what the acive dose is BEFORE us
+        //this MUST BE before last
+        Duration timeSinceTaken = thisDoseTimestamp.difference(lastDoseTimestamp);
+        double decayConstant = math.log(2) / halfLife.value.inMicroseconds;
+        double exponent = -decayConstant * timeSinceTaken.inMicroseconds;
+        double dosageLeft = lastActiveDose * math.pow(math.e, exponent);
+
+        //register the new doses active
+        newActiveDoses[i] = dosageLeft + thisValue;
+
+        double oldDose = newActiveDoses[i] - thisValue;
+      }
+    }
+    activeDosesVN.value = newActiveDoses;
   }
 }

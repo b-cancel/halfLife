@@ -1,5 +1,6 @@
 //flutter
 import 'package:flutter/material.dart';
+import 'package:half_life/struct/doses.dart';
 
 //plugin
 import 'package:scroll_to_index/scroll_to_index.dart';

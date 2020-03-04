@@ -12,7 +12,7 @@ class HeaderSliver extends StatefulWidget {
     @required this.chartHeight,
     @required this.statusBarHeight,
     @required this.lastDateTime,
-    @required this.medication,
+    @required this.dosesVN,
   }) : super(key: key);
 
   final ValueNotifier<DateTime> theSelectedDateTime;
@@ -20,7 +20,7 @@ class HeaderSliver extends StatefulWidget {
   final double chartHeight;
   final double statusBarHeight;
   final ValueNotifier<DateTime> lastDateTime;
-  final AMedication medication;
+  final ValueNotifier<List<Dose>> dosesVN;
 
   @override
   _HeaderSliverState createState() => _HeaderSliverState();
@@ -192,7 +192,7 @@ class _HeaderSliverState extends State<HeaderSliver> {
                         theSelectedDateTime: widget.theSelectedDateTime,
                         screenWidth: MediaQuery.of(context).size.width,
                         halfLife: halfLife.value,
-                        doses: widget.medication.doses,
+                        doses: widget.dosesVN.value,
                       ),
                     ),
                   ),
