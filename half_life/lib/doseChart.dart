@@ -5,7 +5,6 @@ import 'dart:math' as math;
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:flutter/material.dart';
 import 'package:half_life/shared/conditional.dart';
-import 'package:half_life/shared/doseTile/tile.dart';
 import 'package:half_life/shared/timeOfDay.dart';
 import 'package:half_life/struct/doses.dart';
 import 'package:half_life/utils/dateTimeFormat.dart';

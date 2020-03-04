@@ -1,16 +1,17 @@
-import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import 'package:flutter_icons/flutter_icons.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:half_life/shared/doseTile/options.dart';
-import 'package:half_life/shared/tileDivider.dart';
-import 'package:half_life/shared/timeOfDay.dart';
-import 'package:half_life/utils/dateTimeFormat.dart';
-import 'package:half_life/utils/durationFormat.dart';
+
+//plugins
 import 'package:scroll_to_index/scroll_to_index.dart';
 import 'package:vector_math/vector_math_64.dart' as vect;
-import 'package:animator/animator.dart';
 
+//internal
+import 'package:half_life/pages/medication/item/options.dart';
+import 'package:half_life/pages/medication/item/pill.dart';
+import 'package:half_life/pages/medication/item/arrow.dart';
+import 'package:half_life/shared/tileDivider.dart';
+import 'package:half_life/shared/timeOfDay.dart';
+
+//widget
 class DoseTile extends StatefulWidget {
   const DoseTile({
     Key key,
@@ -23,6 +24,7 @@ class DoseTile extends StatefulWidget {
     @required this.softHeaderColor,
     //values
     @required this.dose,
+    @required this.activeDose,
     @required this.timeTaken,
     @required this.timeSinceTaken,
     //for selected date time
@@ -38,6 +40,7 @@ class DoseTile extends StatefulWidget {
   final Color softHeaderColor;
 
   final double dose;
+  final double activeDose;
   final DateTime timeTaken;
   final Duration timeSinceTaken;
 
@@ -101,8 +104,6 @@ class _DoseTileState extends State<DoseTile> {
 
   @override
   Widget build(BuildContext context) {
-    double activeDoseAfter = 123;
-
     Widget header = ClipRRect(
       borderRadius: BorderRadius.all(
         Radius.circular(24),
@@ -142,7 +143,7 @@ class _DoseTileState extends State<DoseTile> {
                 ],
               ),
               subtitle: PillSubtitle(
-                activeDoseAfter: activeDoseAfter,
+                activeDoseAfter: widget.activeDose,
                 dose: widget.dose,
               ),
               trailing: RotatingIcon(
@@ -219,97 +220,6 @@ class _DoseTileState extends State<DoseTile> {
   }
 }
 
-class PillSubtitle extends StatelessWidget {
-  const PillSubtitle({
-    Key key,
-    @required this.activeDoseAfter,
-    @required this.dose,
-  }) : super(key: key);
-
-  final double activeDoseAfter;
-  final double dose;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Text(
-          (activeDoseAfter - dose).round().toString(),
-        ),
-        Icon(
-          Icons.arrow_right,
-        ),
-        ClipRRect(
-          borderRadius: BorderRadius.all(
-            Radius.circular(10),
-          ),
-          child: Container(
-            height: 20,
-            child: Row(
-              children: [
-                Container(
-                  width: 16,
-                  color: ThemeData.dark().primaryColorLight,
-                ),
-                Container(
-                  color: Theme.of(context).accentColor,
-                  alignment: Alignment.center,
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 8,
-                  ),
-                  child: Container(
-                    padding: EdgeInsets.only(
-                      right: 10,
-                    ),
-                    child: DefaultTextStyle(
-                      style: TextStyle(
-                        color: ThemeData.dark().scaffoldBackgroundColor,
-                      ),
-                      child: Stack(
-                        children: [
-                          Text(
-                            dose.round().toString(),
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Positioned(
-                            right: 0,
-                            bottom: 0,
-                            child: Transform.translate(
-                              offset: Offset(8, 2),
-                              child: Text(
-                                "u",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                Container(
-                  width: 16,
-                  color: ThemeData.dark().scaffoldBackgroundColor,
-                ),
-              ],
-            ),
-          ),
-        ),
-        Icon(
-          Icons.arrow_right,
-        ),
-        Text(
-          activeDoseAfter.round().toString(),
-        ),
-      ],
-    );
-  }
-}
-
 class Corners extends StatelessWidget {
   const Corners({
     Key key,
@@ -337,77 +247,6 @@ class Corners extends StatelessWidget {
         ),
         height: 36,
         color: ThemeData.dark().cardColor,
-      ),
-    );
-  }
-}
-
-class RotatingIcon extends StatefulWidget {
-  RotatingIcon({
-    @required this.color,
-    @required this.duration,
-    @required this.isOpen,
-  });
-
-  //passed params
-  final Color color;
-  final Duration duration;
-  final ValueNotifier<bool> isOpen;
-
-  @override
-  _RotatingIconState createState() => _RotatingIconState();
-}
-
-class _RotatingIconState extends State<RotatingIcon> {
-  final ValueNotifier<double> tweenBeginning = new ValueNotifier<double>(-1);
-  final ValueNotifier<double> fractionOfDuration = new ValueNotifier<double>(1);
-  final double normalRotation = 0;
-  final double otherRotation = (-math.pi / 4) * 4;
-
-  updateState(){
-    if(mounted){
-      setState(() {});
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    widget.isOpen.addListener(updateState);
-  }
-  
-  @override
-  void dispose() { 
-    widget.isOpen.removeListener(updateState);
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Animator<double>(
-      resetAnimationOnRebuild: true,
-      tween: widget.isOpen.value
-        ? Tween<double>(
-            begin: tweenBeginning.value == -1 ? normalRotation : tweenBeginning.value, 
-            end: otherRotation,
-        )
-        : Tween<double>(
-            begin: tweenBeginning.value == -1 ? otherRotation : tweenBeginning.value, 
-            end: normalRotation,
-        ),
-      duration: Duration(
-        milliseconds: ((widget.duration.inMilliseconds * fractionOfDuration.value).toInt()),
-      ),
-      customListener: (animator) {
-        tweenBeginning.value = animator.animation.value;
-        fractionOfDuration.value = animator.controller.value;
-      },
-      builder: (anim) => Transform.rotate(
-        angle: anim.value,
-        child: Icon(
-          Icons.keyboard_arrow_down,
-          color: widget.color,
-        ),
       ),
     );
   }

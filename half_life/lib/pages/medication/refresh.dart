@@ -10,11 +10,11 @@ import 'package:scroll_to_index/scroll_to_index.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 //internal
+import 'package:half_life/pages/medication/groups/group.dart';
 import 'package:half_life/pages/medication/header.dart';
 import 'package:half_life/struct/medication.dart';
 import 'package:half_life/utils/goldenRatio.dart';
 import 'package:half_life/struct/doses.dart';
-import 'package:half_life/doseGroup.dart';
 
 //handle pull to refresh
 class RefreshPage extends StatefulWidget {

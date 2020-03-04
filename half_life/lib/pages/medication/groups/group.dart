@@ -1,13 +1,18 @@
+//flutter
 import 'package:flutter/material.dart';
-import 'package:flutter_sticky_header/flutter_sticky_header.dart';
-import 'package:flutter_villains/villain.dart';
-import 'package:half_life/shared/curvedCorner.dart';
-import 'package:half_life/shared/doseTile/tile.dart';
-import 'package:half_life/struct/doses.dart';
-import 'package:half_life/utils/dateTimeFormat.dart';
-import 'package:scroll_to_index/scroll_to_index.dart';
 
-//everything
+//plugin
+import 'package:flutter_sticky_header/flutter_sticky_header.dart';
+import 'package:scroll_to_index/scroll_to_index.dart';
+import 'package:flutter_villains/villain.dart';
+
+//internal
+import 'package:half_life/pages/medication/groups/header.dart';
+import 'package:half_life/pages/medication/item/tile.dart';
+import 'package:half_life/utils/dateTimeFormat.dart';
+import 'package:half_life/struct/doses.dart';
+
+//widget
 class DoseGroup extends StatelessWidget {
   DoseGroup({
     //open close
@@ -57,7 +62,12 @@ class DoseGroup extends StatelessWidget {
       sliver: SliverAnimatedList(
         initialItemCount: group.length,
         itemBuilder: (BuildContext context, int index, anim) {
-          DateTime timeTaken = group[index].timeStamp;
+          //ease access vars
+          Dose thisDose = group[index];
+          int doseID = thisDose.id;
+          DateTime timeTaken = thisDose.timeStamp;
+
+          //build
           return Villain(
             animateEntrance: true,
             animateReEntrance: true,
@@ -87,12 +97,13 @@ class DoseGroup extends StatelessWidget {
                 ),
                 //the tile
                 DoseTile(
-                  id: group[index].id,
+                  id: doseID,
                   isFirst: index == 0,
                   isLast: index == group.length - 1,
                   isEven: index % 2 == 0,
                   softHeaderColor: Theme.of(context).accentColor,
-                  dose: group[index].value,
+                  dose: thisDose.value,
+                  activeDose: doseIDtoActiveDoseVN.value[doseID],
                   timeTaken: timeTaken,
                   timeSinceTaken: lastDateTime.value.difference(timeTaken),
                   theSelectedDateTime: theSelectedDateTime,
@@ -104,84 +115,6 @@ class DoseGroup extends StatelessWidget {
           );
         },
       ),
-    );
-  }
-}
-
-class GroupHeader extends StatelessWidget {
-  const GroupHeader({
-    Key key,
-    @required this.month,
-    @required this.year,
-  }) : super(key: key);
-
-  final String month;
-  final String year;
-
-  @override
-  Widget build(BuildContext context) {
-    Color backgroundColor = ThemeData.dark().primaryColorDark;
-
-    //build
-    return Stack(
-      children: <Widget>[
-        Container(
-          color: backgroundColor,
-          padding: new EdgeInsets.only(
-            left: 16,
-            right: 16,
-            top: 16,
-            bottom: 8,
-          ),
-          alignment: Alignment.bottomLeft,
-          child: DefaultTextStyle(
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.white, //TODO: maybe use soft header color?
-              fontWeight: FontWeight.bold,
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Text(
-                  month,
-                ),
-                Text(
-                  year,
-                )
-              ],
-            ),
-          ),
-        ),
-        Positioned(
-          bottom: 0,
-          left: 0,
-          right: 0,
-          child: Container(
-            width: MediaQuery.of(context).size.width,
-            child: Transform.translate(
-              offset: Offset(0, 24),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                mainAxisSize: MainAxisSize.max,
-                children: [
-                  CurvedCorner(
-                    isTop: true,
-                    isLeft: true,
-                    cornerColor: backgroundColor,
-                  ),
-                  CurvedCorner(
-                    isTop: true,
-                    isLeft: false,
-                    cornerColor: backgroundColor,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ],
     );
   }
 }
