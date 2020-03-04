@@ -75,19 +75,64 @@ class _HeaderSliverState extends State<HeaderSliver> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              IconButton(
-                icon: Icon(
-                  Icons.chevron_left,
-                ), 
-                onPressed: (){
-                  print("back to medication list");
-                },
+              Expanded(
+                child: Container(
+                  alignment: Alignment.centerLeft,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.bottomCenter,
+                      end: Alignment.topCenter,
+                      colors: [
+                        Theme.of(context).accentColor,
+                        Theme.of(context).accentColor.withOpacity(0.0),
+                      ],
+                      stops: [0.65, 1],
+                      tileMode: TileMode.repeated,
+                    ),
+                  ),
+                  child: IconButton(
+                    icon: Icon(
+                      Icons.chevron_left,
+                    ), 
+                    onPressed: (){
+                      print("back to medication list");
+                    },
+                  ),
+                ),
               ),
-              IconButton(
-                icon: Icon(Icons.add),
-                onPressed: () {
-                  print("add dose");
-                },
+              //spacer so resizing doses doesn't get covered
+              Opacity(
+                opacity: 0,
+                child: Text(
+                  "Doses",
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 30,
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Container(
+                  alignment: Alignment.centerRight,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.bottomCenter,
+                      end: Alignment.topCenter,
+                      colors: [
+                        Theme.of(context).accentColor,
+                        Theme.of(context).accentColor.withOpacity(0.0),
+                      ],
+                      stops: [0.65, 1],
+                      tileMode: TileMode.repeated,
+                    ),
+                  ),
+                  child: IconButton(
+                    icon: Icon(Icons.add),
+                    onPressed: () {
+                      print("add dose");
+                    },
+                  ),
+                ),
               ),
             ],
           ),
@@ -99,15 +144,35 @@ class _HeaderSliverState extends State<HeaderSliver> {
       flexibleSpace: FlexibleSpaceBar(
         //scaling title
         centerTitle: true,
-        title: Text(
-          "Doses",
-          style: TextStyle(
-            color: Colors.black,
+        title: Container(
+          padding: EdgeInsets.only(
+            bottom: 12,
+          ),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.bottomCenter,
+              end: Alignment.topCenter,
+              colors: [
+                Theme.of(context).accentColor,
+                Theme.of(context).accentColor.withOpacity(0.0),
+              ],
+              stops: [0.75, 1],
+              tileMode: TileMode.repeated,
+            ),
+          ),
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: 16.0,
+            ),
+            child: Text(
+              "Doses",
+              style: TextStyle(
+                color: Colors.black,
+              ),
+            ),
           ),
         ),
-        titlePadding: EdgeInsets.only(
-          bottom: 12,
-        ),
+        titlePadding: EdgeInsets.all(0),
         //pin, pins on bottom
         //parallax keeps the background centered within flexible space
         collapseMode: CollapseMode.parallax,

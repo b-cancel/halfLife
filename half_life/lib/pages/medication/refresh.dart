@@ -202,7 +202,7 @@ class _RefreshPageState extends State<RefreshPage> {
             //yes header animation
             enablePullDown: true,
             header: WaterDropMaterialHeader(
-              offset: chartHeight,
+              offset: chartHeight + appBarHeight,
               backgroundColor: Theme.of(context).accentColor,
               color: ThemeData.dark().scaffoldBackgroundColor,
             ),
