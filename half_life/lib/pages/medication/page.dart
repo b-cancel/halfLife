@@ -1,14 +1,13 @@
 //flutter
 import 'package:flutter/material.dart';
-import 'package:half_life/struct/doses.dart';
 
 //plugin
 import 'package:scroll_to_index/scroll_to_index.dart';
 
 //internal
+import 'package:half_life/pages/medication/refresh.dart';
 import 'package:half_life/shared/scrollToTop.dart';
 import 'package:half_life/struct/medication.dart';
-import 'package:half_life/pages/medication/refresh.dart';
 
 //body
 class AMedicationPage extends StatefulWidget {

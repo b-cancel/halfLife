@@ -7,7 +7,6 @@ import 'package:half_life/struct/doses.dart';
 import 'package:half_life/utils/dateTimeFormat.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 
-
 //everything
 class DoseGroup extends StatelessWidget {
   DoseGroup({
@@ -18,6 +17,7 @@ class DoseGroup extends StatelessWidget {
     @required this.lastDateTime,
     @required this.theSelectedDateTime,
     @required this.lastGroup,
+    @required this.doseIDtoActiveDoseVN,
     @required this.group,
   });
 
@@ -27,6 +27,7 @@ class DoseGroup extends StatelessWidget {
   //inner
   final ValueNotifier<DateTime> lastDateTime;
   final ValueNotifier<DateTime> theSelectedDateTime;
+  final ValueNotifier<Map<int, double>> doseIDtoActiveDoseVN;
   final List<Dose> group;
   final bool lastGroup;
 
@@ -135,9 +136,10 @@ class GroupHeader extends StatelessWidget {
           alignment: Alignment.bottomLeft,
           child: DefaultTextStyle(
             style: TextStyle(
-                fontSize: 16,
-                color: Colors.white, //TODO: maybe use soft header color?
-                fontWeight: FontWeight.bold),
+              fontSize: 16,
+              color: Colors.white, //TODO: maybe use soft header color?
+              fontWeight: FontWeight.bold,
+            ),
             child: Row(
               mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -153,31 +155,32 @@ class GroupHeader extends StatelessWidget {
           ),
         ),
         Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: Container(
-              width: MediaQuery.of(context).size.width,
-              child: Transform.translate(
-                offset: Offset(0, 24),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    CurvedCorner(
-                      isTop: true,
-                      isLeft: true,
-                      cornerColor: backgroundColor,
-                    ),
-                    CurvedCorner(
-                      isTop: true,
-                      isLeft: false,
-                      cornerColor: backgroundColor,
-                    ),
-                  ],
-                ),
+          bottom: 0,
+          left: 0,
+          right: 0,
+          child: Container(
+            width: MediaQuery.of(context).size.width,
+            child: Transform.translate(
+              offset: Offset(0, 24),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  CurvedCorner(
+                    isTop: true,
+                    isLeft: true,
+                    cornerColor: backgroundColor,
+                  ),
+                  CurvedCorner(
+                    isTop: true,
+                    isLeft: false,
+                    cornerColor: backgroundColor,
+                  ),
+                ],
               ),
-            )),
+            ),
+          ),
+        ),
       ],
     );
   }

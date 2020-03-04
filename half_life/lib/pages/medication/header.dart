@@ -2,25 +2,32 @@ import 'package:flutter/material.dart';
 import 'package:half_life/doseChart.dart';
 import 'package:half_life/halfLifeChanger.dart';
 import 'package:half_life/struct/doses.dart';
-import 'package:half_life/struct/medication.dart';
 
 class HeaderSliver extends StatefulWidget {
   const HeaderSliver({
     Key key,
-    @required this.theSelectedDateTime,
-    @required this.bottomBarHeight,
-    @required this.chartHeight,
     @required this.statusBarHeight,
+    @required this.appBarHeight,
+    @required this.accentHeight,
+    @required this.bottomBarHeight,
+    //other
+    @required this.theSelectedDateTime,
     @required this.lastDateTime,
     @required this.dosesVN,
+    @required this.doseIDtoActiveDoseVN,
+    @required this.halfLife,
   }) : super(key: key);
 
-  final ValueNotifier<DateTime> theSelectedDateTime;
-  final double bottomBarHeight;
-  final double chartHeight;
   final double statusBarHeight;
+  final double appBarHeight;
+  final double accentHeight;
+  final double bottomBarHeight;
+  //other
+  final ValueNotifier<DateTime> theSelectedDateTime;
   final ValueNotifier<DateTime> lastDateTime;
   final ValueNotifier<List<Dose>> dosesVN;
+  final ValueNotifier<Map<int,double>> doseIDtoActiveDoseVN;
+  final ValueNotifier<Duration> halfLife;
 
   @override
   _HeaderSliverState createState() => _HeaderSliverState();
@@ -30,16 +37,15 @@ class _HeaderSliverState extends State<HeaderSliver> {
   //eventually object updaters
   final TextEditingController textCtrl = new TextEditingController(text: "Fluvoxamine");
 
-  final ValueNotifier<Duration> halfLife = ValueNotifier<Duration>(
-    Duration(
-      //36 to 60
-      hours: 48,
-    ),
-  );
-
   //build
   @override
   Widget build(BuildContext context) {
+    double flexibleHeight = widget.accentHeight; //the bottom bar is included here
+    //add extra space for visual elements that wont be the accent color
+    //flexibleHeight += widget.statusBarHeight; //equivalent to bottom buttons not factored into ratio
+    flexibleHeight += widget.appBarHeight;
+
+    //build
     return SliverAppBar(
       backgroundColor: Theme.of(context).accentColor,
       //the top title (is basically the bottom AppBar)
@@ -88,7 +94,7 @@ class _HeaderSliverState extends State<HeaderSliver> {
         ),
       ),
       //most of the screen
-      expandedHeight: widget.chartHeight,
+      expandedHeight: flexibleHeight,
       //the graph
       flexibleSpace: FlexibleSpaceBar(
         //scaling title
@@ -131,7 +137,6 @@ class _HeaderSliverState extends State<HeaderSliver> {
               ),
             ),
             Container(
-              height: widget.chartHeight,
               width: MediaQuery.of(context).size.width,
               padding: EdgeInsets.only(
                 top: widget.statusBarHeight,
@@ -144,7 +149,7 @@ class _HeaderSliverState extends State<HeaderSliver> {
                     child: PreferredSize(
                       preferredSize: Size(
                         MediaQuery.of(context).size.width,
-                        56,
+                        widget.appBarHeight,
                       ),
                       child: AppBar(
                         backgroundColor: ThemeData.dark().primaryColorDark,
@@ -177,7 +182,7 @@ class _HeaderSliverState extends State<HeaderSliver> {
                               vertical: 8,
                             ),
                             child: HalfLifeChanger(
-                              halfLife: halfLife,
+                              halfLife: widget.halfLife,
                             ),
                           ),
                         ],
@@ -191,7 +196,7 @@ class _HeaderSliverState extends State<HeaderSliver> {
                         lastDateTime: widget.lastDateTime,
                         theSelectedDateTime: widget.theSelectedDateTime,
                         screenWidth: MediaQuery.of(context).size.width,
-                        halfLife: halfLife.value,
+                        halfLife: widget.halfLife.value,
                         doses: widget.dosesVN.value,
                       ),
                     ),
