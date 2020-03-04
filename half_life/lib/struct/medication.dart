@@ -1,3 +1,5 @@
+import 'package:half_life/struct/doses.dart';
+
 class AMedication{
   int id;
 
@@ -6,6 +8,7 @@ class AMedication{
   String get name => _name;
   set name(String newName){
     _name = newName;
+    print("updatefile");
     //Medications.updateFile();
   }
 
@@ -14,14 +17,27 @@ class AMedication{
   DateTime get lastDoseDateTime => _lastDoseDateTime;
   set lastDoseDateTime(DateTime newLastDoseDateTime){
     _lastDoseDateTime = newLastDoseDateTime;
+    print("updatefile");
     //Medications.updateFile();
   }
   
   //half life
-  int _halfLife;
-  int get halfLife => _halfLife;
-  set halfLife(int newHalfLife){
+  Duration _halfLife;
+  Duration get halfLife => _halfLife;
+  set halfLife(Duration newHalfLife){
     _halfLife = newHalfLife;
+    print("updatefile");
+    //Medications.updateFile();
+  }
+
+  List<Dose> doses;
+
+  //highest dose
+  int _lowestDose;
+  int get lowestDose => _lowestDose;
+  set lowestDose(int newLowestDose){
+    _lowestDose = newLowestDose;
+    print("updatefile");
     //Medications.updateFile();
   }
 
@@ -30,14 +46,7 @@ class AMedication{
   int get highestDose => _highestDose;
   set highestDose(int newHighestDose){
     _highestDose = newHighestDose;
-    //Medications.updateFile();
-  }
-
-  //highest dose
-  int _lowestDose;
-  int get lowestDose => _lowestDose;
-  set lowestDose(int newLowestDose){
-    _lowestDose = newLowestDose;
+    print("updatefile");
     //Medications.updateFile();
   }
 
@@ -45,9 +54,8 @@ class AMedication{
   AMedication(
     String name, 
     DateTime lastDoseDateTime, 
-    int halfLife,
+    Duration halfLife,
   ){
-    //TODO: add new ID
     _name = name;
     _lastDoseDateTime = lastDoseDateTime;
     _halfLife = halfLife;

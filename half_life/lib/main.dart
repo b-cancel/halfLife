@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_villains/villain.dart';
 
 //internal
+import 'package:half_life/pages/medication/page.dart';
+import 'package:half_life/struct/medication.dart';
 import 'package:half_life/struct/doses.dart';
-import 'package:half_life/doseBody.dart';
 
 //widget
 void main() => runApp(MyApp());
@@ -12,12 +13,16 @@ void main() => runApp(MyApp());
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    //the doses "read in" from the file from the medicine class
     List<Dose> doses = new List<Dose>();
-    List<int> iDs = [4,21,6,2,5,1,9,23,85,293,0];
+    
+    //manually adding all the doses with obvious IDs
+    int startID = 0;
 
+    //first dose 100 mg
     doses.add(
       Dose(
-        iDs[0],
+        startID,
         100,
         DateTime(
           2020,
@@ -27,127 +32,13 @@ class MyApp extends StatelessWidget {
         ),
       ),
     );
+    startID++;
 
+    //2nd dose adjusted
+    //didn't let me sleep
     doses.add(
       Dose(
-        iDs[1],
-        25,
-        DateTime(
-          2020,
-          2,
-          28,
-          4,
-        ),
-      ),
-    );
-
-    doses.add(
-      Dose(
-        iDs[2],
-        0,
-        DateTime(
-          2020,
-          1, //feb
-          24, //20
-          22, //1 am
-        ),
-      ),
-    );
-
-    doses.add(
-      Dose(
-        iDs[3],
-        0,
-        DateTime(
-          2020,
-          1, //feb
-          24, //20
-          19, //1 am
-        ),
-      ),
-    );
-
-    doses.add(
-      Dose(
-        iDs[4],
-        0,
-        DateTime(
-          2020,
-          1, //feb
-          24, //20
-          16, //1 am
-        ),
-      ),
-    );
-
-    doses.add(
-      Dose(
-        iDs[5],
-        0,
-        DateTime(
-          2020,
-          1, //feb
-          24, //20
-          13, //1 am
-        ),
-      ),
-    );
-
-    doses.add(
-      Dose(
-        iDs[6],
-        0,
-        DateTime(
-          2020,
-          1, //feb
-          24, //20
-          10, //1 am
-        ),
-      ),
-    );
-
-    doses.add(
-      Dose(
-        iDs[7],
-        0,
-        DateTime(
-          2020,
-          1, //feb
-          24, //20
-          7, //1 am
-        ),
-      ),
-    );
-
-    doses.add(
-      Dose(
-        iDs[8],
-        0,
-        DateTime(
-          2020,
-          1, //feb
-          24, //20
-          4, //1 am
-        ),
-      ),
-    );
-
-    doses.add(
-      Dose(
-        iDs[9],
-        0,
-        DateTime(
-          2020,
-          1, //feb
-          24, //20
-          1, //1 am
-        ),
-      ),
-    );
-    
-    doses.add(
-      Dose(
-        iDs[10],
+        startID,
         50,
         DateTime(
           2020,
@@ -157,7 +48,90 @@ class MyApp extends StatelessWidget {
         ),
       ),
     );
+    startID++;
 
+    //dose after hiatus
+    //made me really sleep at around 1pm
+    doses.add(
+      Dose(
+        startID,
+        25,
+        DateTime(
+          2020,
+          3, //month
+          1, //day
+          1, //time
+        ),
+      ),
+    );
+    startID++;
+
+    //lower to 12mg dose
+    //since still with headaches
+    doses.add(
+      Dose(
+        startID,
+        12,
+        DateTime(
+          2020,
+          3, //month
+          1, //day
+          23, //time
+        ),
+      ),
+    );
+    startID++;
+
+    //trying to stay at lower dose
+    doses.add(
+      Dose(
+        startID,
+        12,
+        DateTime(
+          2020,
+          3, //month
+          3, //day
+          8, //time
+        ),
+      ),
+    );
+    startID++;
+
+    //dose too low
+    //crippled with anxiety
+    doses.add(
+      Dose(
+        startID,
+        25,
+        DateTime(
+          2020,
+          3, //month
+          4, //day
+          3, //time
+        ),
+      ),
+    );
+    startID++;
+    
+    //construct the medicine
+    //so we can then pass it as if we had read it in
+    //and if doing so would let us update things as needed
+    AMedication medication = AMedication(
+      "Fluvoxamine", 
+      doses.last.timeStamp, 
+      //between 36 and 60 hours
+      Duration(hours: 48),
+      //NOTE: lowest and highest are by defualt null
+      //we imply null to be 0 for the sake of processing everything
+      //but we do that later
+      //we don't manually set it to 0
+      //this is because for the highest value
+      //the upper limit will always be
+      //the highest value until the user actually sets it
+    );
+    medication.doses = doses;
+
+    //build
     return MaterialApp(
       title: 'Half Life',
       navigatorObservers: [
@@ -169,8 +143,8 @@ class MyApp extends StatelessWidget {
         //NOTE: you can only set this once aparently
         textSelectionHandleColor: Colors.white,
       ),
-      home: DosesBody(
-        doses: doses,
+      home: AMedicationPage(
+        medication: medication,
       ),
     );
   }

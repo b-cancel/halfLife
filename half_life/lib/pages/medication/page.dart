@@ -6,22 +6,22 @@ import 'package:scroll_to_index/scroll_to_index.dart';
 
 //internal
 import 'package:half_life/shared/scrollToTop.dart';
-import 'package:half_life/struct/doses.dart';
-import 'package:half_life/doseRefresh.dart';
+import 'package:half_life/struct/medication.dart';
+import 'package:half_life/pages/medication/refresh.dart';
 
 //body
-class DosesBody extends StatefulWidget {
-  DosesBody({
-    @required this.doses,
+class AMedicationPage extends StatefulWidget {
+  AMedicationPage({
+    @required this.medication,
   });
 
-  final List<Dose> doses;
+  final AMedication medication;
 
   @override
-  _DosesBodyState createState() => _DosesBodyState();
+  _AMedicationPageState createState() => _AMedicationPageState();
 }
 
-class _DosesBodyState extends State<DosesBody> {
+class _AMedicationPageState extends State<AMedicationPage> {
   //scroll to top function
   final AutoScrollController scrollController = new AutoScrollController();
   final ValueNotifier<bool> onTop = new ValueNotifier(true);
@@ -69,9 +69,9 @@ class _DosesBodyState extends State<DosesBody> {
     return Scaffold(
       body: Stack(
         children: <Widget>[
-          DosesRefresh(
+          RefreshPage(
             autoScrollController: scrollController,
-            doses: widget.doses,
+            medication: widget.medication,
           ),
           ScrollToTopButton(
             onTop: onTop,

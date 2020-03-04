@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 //plugin
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:half_life/struct/medication.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
@@ -13,20 +14,20 @@ import 'package:half_life/headerSliver.dart';
 import 'package:half_life/doseGroup.dart';
 
 //handle pull to refresh
-class DosesRefresh extends StatefulWidget {
-  DosesRefresh({
+class RefreshPage extends StatefulWidget {
+  RefreshPage({
     @required this.autoScrollController,
-    @required this.doses,
+    @required this.medication,
   });
 
   final AutoScrollController autoScrollController;
-  final List<Dose> doses;
+  final AMedication medication;
 
   @override
-  _DosesRefreshState createState() => _DosesRefreshState();
+  _RefreshPageState createState() => _RefreshPageState();
 }
 
-class _DosesRefreshState extends State<DosesRefresh> {
+class _RefreshPageState extends State<RefreshPage> {
   //-------------------------only allows one dose flyout to be open an once
 
   final ValueNotifier<bool> othersCloseOnToggle = new ValueNotifier<bool>(false);
@@ -36,16 +37,6 @@ class _DosesRefreshState extends State<DosesRefresh> {
   final ValueNotifier<DateTime> theSelectedDateTime = new ValueNotifier<DateTime>(
     DateTime.now(), //immediately overriden
   );
-  
-  @override
-  void initState() { 
-    //super init
-    super.initState();
-
-    //initially select DT is now
-    theSelectedDateTime.value = lastDateTime.value;
-    //selectDateTime.addListener(() { })
-  }
 
   //-------------------------Refresh Code
 
@@ -69,6 +60,17 @@ class _DosesRefreshState extends State<DosesRefresh> {
     if (mounted) setState(() {});
   }
 
+  //-------------------------Init / Dispose
+
+  @override
+  void initState() { 
+    //super init
+    super.initState();
+
+    //initially select DT is now
+    theSelectedDateTime.value = lastDateTime.value;
+  }
+
   //-------------------------Widget Builders
 
   //build
@@ -86,12 +88,14 @@ class _DosesRefreshState extends State<DosesRefresh> {
 
     //create app bar
     Widget sliverAppBar = HeaderSliver(
-      theSelectedDateTime: theSelectedDateTime,
-      bottomBarHeight: bottomBarHeight, 
       chartHeight: chartHeight, 
       statusBarHeight: statusBarHeight, 
+      bottomBarHeight: bottomBarHeight, 
       lastDateTime: lastDateTime, 
-      doses: widget.doses,
+      //updated when messing with sliver
+      theSelectedDateTime: theSelectedDateTime,
+      //data
+      medication: widget.medication,
     );
 
     //generate group widgets
@@ -185,16 +189,16 @@ class _DosesRefreshState extends State<DosesRefresh> {
     else doseGroups.clear();
 
     //the doses that we just took go on top
-    widget.doses.sort((a, b) => a.compareTo(b));
+    widget.medication.doses.sort((a, b) => a.compareTo(b));
 
     //NOTE: must use month AND year to be safe
     int doseMonth = -1;
     int doseYear = -1;
 
     //create groups
-    for (int i = 0; i < widget.doses.length; i++) {
+    for (int i = 0; i < widget.medication.doses.length; i++) {
       //extract dose properties
-      Dose thisDose = widget.doses[i];
+      Dose thisDose = widget.medication.doses[i];
       int thisMonth = thisDose.timeStamp.month;
       int thisYear = thisDose.timeStamp.year;
       bool sameMonth = thisMonth == doseMonth;
