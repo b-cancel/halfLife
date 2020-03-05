@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:half_life/pages/medication/item/options.dart';
+import 'package:half_life/shared/selectTimeDate.dart';
 import 'package:half_life/struct/doses.dart';
+import 'package:half_life/utils/dateTimeFormat.dart';
 
 class AddDoseField extends StatefulWidget {
   const AddDoseField({
@@ -21,31 +24,32 @@ class AddDoseField extends StatefulWidget {
 class _AddDoseFieldState extends State<AddDoseField> {
   final FocusNode focusNode = new FocusNode();
   final TextEditingController newDoseController = new TextEditingController();
-  DateTime newDateTime = DateTime.now();
+  final ValueNotifier<DateTime> newDateTime =
+      new ValueNotifier<DateTime>(DateTime.now());
 
   updateState() {
     if (mounted) {
       //grab or "reset" date time
-      newDateTime = DateTime.now();
+      newDateTime.value = DateTime.now();
 
       //we don't want to add it or already did
-      if(widget.addingDose.value == false){
+      if (widget.addingDose.value == false) {
         FocusScope.of(context).unfocus();
-      }
-      else{
+      } else {
         //clear data
         newDoseController.clear();
 
         //focus on the field
         FocusScope.of(context).requestFocus(focusNode);
       }
-      
+
       //show changes
       setState(() {});
     }
   }
 
-  saveDose(){
+  saveDose() {
+    /*
     //find next ID
     int largestID = 0;
     for(int i = 0; i < widget.dosesVN.value.length; i++){
@@ -78,6 +82,7 @@ class _AddDoseFieldState extends State<AddDoseField> {
 
     //notify everything
     widget.dosesVN.value = newDoses;
+    */
 
     //close ourselves
     widget.addingDose.value = false;
@@ -230,7 +235,7 @@ class _AddDoseFieldState extends State<AddDoseField> {
                     ),
                     child: Container(
                       decoration: BoxDecoration(
-                        color: ThemeData.dark().scaffoldBackgroundColor,
+                        color: ThemeData.dark().primaryColorLight,
                         borderRadius: BorderRadius.all(
                           Radius.circular(2),
                         ),
@@ -240,13 +245,229 @@ class _AddDoseFieldState extends State<AddDoseField> {
                     ),
                   ),
                   Expanded(
-                    child: Container(),
+                    child: DateTimeSelector(
+                      newDateTime: newDateTime,
+                    ),
                   ),
                 ],
               ),
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class DateTimeSelector extends StatefulWidget {
+  const DateTimeSelector({
+    Key key,
+    @required this.newDateTime,
+  }) : super(key: key);
+
+  final ValueNotifier<DateTime> newDateTime;
+
+  @override
+  _DateTimeSelectorState createState() => _DateTimeSelectorState();
+}
+
+class _DateTimeSelectorState extends State<DateTimeSelector> {
+  updateState() {
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    widget.newDateTime.addListener(updateState);
+  }
+
+  @override
+  void dispose() {
+    widget.newDateTime.removeListener(updateState);
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    DateTime displayDT = widget.newDateTime.value;
+    int hourAdjusted = displayDT.hour;
+    bool isAM = hourAdjusted < 12;
+    print("hour: " + hourAdjusted.toString());
+    if(isAM){
+      if(hourAdjusted == 0){
+        hourAdjusted = 12;
+      }
+    }
+    else{
+      if(hourAdjusted != 12){
+        hourAdjusted -= 12;
+      }
+    }
+    print("hour af: " + hourAdjusted.toString());
+    int minute = displayDT.minute;
+    int zerosToAdd = 2 - minute.toString().length;
+    String zeros = (zerosToAdd == 0) ? "" : (zerosToAdd == 1 ? "0" : "00");
+
+    //styling
+    TextStyle bold = TextStyle(
+      fontWeight: FontWeight.bold,
+    );
+
+    //build
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () async {
+          DateTime newDT = await selectTimeDate(
+            context,
+            displayDT,
+          );
+
+          if (newDT != null) {
+            widget.newDateTime.value = newDT;
+          }
+        },
+        child: Container(
+          height: 72,
+          padding: EdgeInsets.symmetric(
+            horizontal: 12,
+          ),
+          alignment: Alignment.center,
+          child: Row(
+            children: <Widget>[
+              Padding(
+                padding: EdgeInsets.only(
+                  right: 8.0,
+                ),
+                child: Icon(
+                  Icons.calendar_today,
+                  color: Colors.white,
+                  size: 36,
+                ),
+              ),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                DaysAgo(
+                  dateTime: displayDT,
+                ),
+                Row(
+                  children: [
+                    Text(
+                      "On ",
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.white,
+                      ),
+                    ),
+                    RichText(
+                      text: TextSpan(
+                        children: [
+                          TextSpan(
+                            text: DateTimeFormat.weekDayToString[displayDT.weekday],
+                            style: bold,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                RichText(
+                  text: TextSpan(
+                    children: [
+                      TextSpan(
+                        text: "the ",
+                      ),
+                      TextSpan(
+                        text: displayDT.day.toString(),
+                        style: bold,
+                      ),
+                      TextSpan(
+                        text: DateTimeFormat.daySuffix(
+                          displayDT.day,
+                        ),
+                      ),
+                      TextSpan(
+                        text: " of ",
+                      ),
+                      TextSpan(
+                        text: displayDT.year.toString(),
+                        style: bold,
+                      ),
+                    ],
+                  ),
+                ),
+                RichText(
+                  text: TextSpan(
+                    children: [
+                      TextSpan(
+                        text: "at ",
+                      ),
+                      TextSpan(
+                        text:  hourAdjusted.toString() 
+                        + ":" 
+                        + zeros
+                        + minute.toString(),
+                        style: bold,
+                      ),
+                      TextSpan(
+                        text: isAM ? " am" : " pm",
+                      ),
+                    ],
+                  ),
+                ),
+              ],)
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class DaysAgo extends StatelessWidget {
+  DaysAgo({
+    @required this.dateTime,
+  });
+
+  final DateTime dateTime;
+
+  @override
+  Widget build(BuildContext context) {
+    int daysAgo = 0;
+    DateTime now = DateTime.now();
+    Duration d = now.difference(dateTime);
+    daysAgo = d.inDays;
+    if (daysAgo == 0) {
+      //24 hours may not have passed but it still may be a different day
+      bool differentDay = now.day != dateTime.day;
+      daysAgo = differentDay ? 1 : 0;
+    }
+
+    //build if days have passed
+    return Visibility(
+      visible: daysAgo > 0,
+      child: RichText(
+        text: TextSpan(
+          style: TextStyle(
+            color: Colors.white,
+          ),
+          children: [
+            TextSpan(
+              text: daysAgo.toString(),
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            TextSpan(
+              text: " days ago",
+            )
+          ],
+        ),
       ),
     );
   }
