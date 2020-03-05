@@ -25,19 +25,10 @@ class ScrollToTopButton extends StatefulWidget {
 }
 
 class _ScrollToTopButtonState extends State<ScrollToTopButton> {
-  int keyboardListenerID;
-  bool keyboardOpen;
-  bool showButton;
-
-  updateShowButton(){
-    keyboardOpen = KeyboardVisibilityNotification().isKeyboardVisible;
-    if(widget.onTop.value == false && keyboardOpen == false){
-      showButton = true;
-    }
-  }
+  int keyboardSubscriberID;
+  bool keyboardVisible;
 
   updateState(){
-    updateShowButton();
     if(mounted) setState((){});
   }
 
@@ -48,19 +39,17 @@ class _ScrollToTopButtonState extends State<ScrollToTopButton> {
     //listeners
     widget.onTop.addListener(updateState);
     widget.overScroll.addListener(updateState);
-    keyboardListenerID = KeyboardVisibilityNotification().addNewListener(
+    keyboardSubscriberID = KeyboardVisibilityNotification().addNewListener(
       onChange: (bool visible) {
-        updateShowButton();
+        keyboardVisible = visible;
+        updateState();
       },
     );
-
-    //start value
-    updateShowButton();
   }
 
   @override
   void dispose() {
-    KeyboardVisibilityNotification().removeListener(keyboardListenerID);
+    KeyboardVisibilityNotification().removeListener(keyboardSubscriberID);
     widget.overScroll.removeListener(updateState);
     widget.onTop.removeListener(updateState);
     super.dispose();
@@ -68,52 +57,55 @@ class _ScrollToTopButtonState extends State<ScrollToTopButton> {
 
   @override
   Widget build(BuildContext context) {
-    return Positioned(
-      bottom: widget.overScroll.value / 2,
-      left: 0,
-      right: 0,
-      child: Container(
-        alignment: Alignment.bottomCenter,
-        padding: EdgeInsets.only(bottom: 16),
-        child:  AnimatedContainer(
-          duration: Duration(milliseconds: 200),
-          transform: Matrix4.translation(
-            vect.Vector3(
-              0, 
-              showButton ? 0.0 : (16.0 + 56), 
-              0,
+    return Visibility(
+      visible: keyboardVisible == false,
+      child: Positioned(
+        bottom: widget.overScroll.value / 2,
+        left: 0,
+        right: 0,
+        child: Container(
+          alignment: Alignment.bottomCenter,
+          padding: EdgeInsets.only(bottom: 16),
+          child:  AnimatedContainer(
+            duration: Duration(milliseconds: 200),
+            transform: Matrix4.translation(
+              vect.Vector3(
+                0, 
+                widget.onTop.value == false ? 0.0 : (16.0 + 56), 
+                0,
+              ),
             ),
-          ),
-          child: FloatingActionButton(
-            heroTag: 'toTop',
-            backgroundColor: Theme.of(context).accentColor,
-            onPressed: (){
-              widget.scrollController.jumpTo(0);
-            },
-            //slightly shift the combo of the two icons
-            child: FittedBox(
-              fit: BoxFit.contain,
-              child: Transform.translate(
-                offset: Offset(0,-12), //-4),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    Container(
-                      height: 12,
-                      child: Icon(
-                        Icons.minimize,
-                        color: ThemeData.dark().scaffoldBackgroundColor,
+            child: FloatingActionButton(
+              heroTag: 'toTop',
+              backgroundColor: Theme.of(context).accentColor,
+              onPressed: (){
+                widget.scrollController.jumpTo(0);
+              },
+              //slightly shift the combo of the two icons
+              child: FittedBox(
+                fit: BoxFit.contain,
+                child: Transform.translate(
+                  offset: Offset(0,-12), //-4),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      Container(
+                        height: 12,
+                        child: Icon(
+                          Icons.minimize,
+                          color: ThemeData.dark().scaffoldBackgroundColor,
+                        ),
                       ),
-                    ),
-                    Container(
-                      height: 12,
-                      child: Icon(
-                        Icons.keyboard_arrow_up,
-                        color: ThemeData.dark().scaffoldBackgroundColor,
-                        size: 28,
+                      Container(
+                        height: 12,
+                        child: Icon(
+                          Icons.keyboard_arrow_up,
+                          color: ThemeData.dark().scaffoldBackgroundColor,
+                          size: 28,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
