@@ -4,6 +4,9 @@ import 'package:vector_math/vector_math_64.dart' as vect;
 //flutter
 import 'package:flutter/material.dart';
 
+//plugins
+import 'package:keyboard_visibility/keyboard_visibility.dart';
+
 //widget
 class ScrollToTopButton extends StatefulWidget {
   const ScrollToTopButton({
@@ -22,19 +25,42 @@ class ScrollToTopButton extends StatefulWidget {
 }
 
 class _ScrollToTopButtonState extends State<ScrollToTopButton> {
+  int keyboardListenerID;
+  bool keyboardOpen;
+  bool showButton;
+
+  updateShowButton(){
+    keyboardOpen = KeyboardVisibilityNotification().isKeyboardVisible;
+    if(widget.onTop.value == false && keyboardOpen == false){
+      showButton = true;
+    }
+  }
+
   updateState(){
+    updateShowButton();
     if(mounted) setState((){});
   }
 
   @override
   void initState() {
+    super.initState();
+
+    //listeners
     widget.onTop.addListener(updateState);
     widget.overScroll.addListener(updateState);
-    super.initState();
+    keyboardListenerID = KeyboardVisibilityNotification().addNewListener(
+      onChange: (bool visible) {
+        updateShowButton();
+      },
+    );
+
+    //start value
+    updateShowButton();
   }
 
   @override
   void dispose() {
+    KeyboardVisibilityNotification().removeListener(keyboardListenerID);
     widget.overScroll.removeListener(updateState);
     widget.onTop.removeListener(updateState);
     super.dispose();
@@ -54,7 +80,7 @@ class _ScrollToTopButtonState extends State<ScrollToTopButton> {
           transform: Matrix4.translation(
             vect.Vector3(
               0, 
-              (widget.onTop.value) ? (16.0 + 56) : 0.0, 
+              showButton ? 0.0 : (16.0 + 56), 
               0,
             ),
           ),

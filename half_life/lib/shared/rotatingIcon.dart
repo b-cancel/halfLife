@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 
 //plugin
 import 'package:animator/animator.dart';
+import 'package:half_life/shared/conditional.dart';
 
 //internal
 class RotatingIcon extends StatefulWidget {
@@ -13,12 +14,16 @@ class RotatingIcon extends StatefulWidget {
     @required this.color,
     @required this.duration,
     @required this.isOpen,
+    this.start: Icons.keyboard_arrow_down,
+    this.end,
   });
 
   //passed params
   final Color color;
   final Duration duration;
   final ValueNotifier<bool> isOpen;
+  final IconData start;
+  final IconData end;
 
   @override
   _RotatingIconState createState() => _RotatingIconState();
@@ -70,9 +75,16 @@ class _RotatingIconState extends State<RotatingIcon> {
       },
       builder: (anim) => Transform.rotate(
         angle: anim.value,
-        child: Icon(
-          Icons.keyboard_arrow_down,
-          color: widget.color,
+        child: Conditional(
+          condition: widget.end == null, 
+          ifTrue: Icon(
+            widget.start,
+            color: widget.color,
+          ), 
+          ifFalse: Icon(
+            anim.value == 0 ?  widget.start : widget.end,
+            color: widget.color,
+          ),
         ),
       ),
     );

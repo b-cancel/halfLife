@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 
 //plugin
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:half_life/pages/medication/add/field.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
@@ -36,6 +37,10 @@ class _RefreshPageState extends State<RefreshPage> {
   final ValueNotifier<List<Dose>> dosesVN = new ValueNotifier(new List<Dose>());
   final ValueNotifier<Map<int, double>> doseIDtoActiveDoseVN =
       new ValueNotifier(Map<int, double>());
+
+  //-------------------------show the add dose UI
+
+  final ValueNotifier<bool> addingDose = new ValueNotifier<bool>(false);
 
   //-------------------------only allows one dose flyout to be open an once
 
@@ -142,11 +147,19 @@ class _RefreshPageState extends State<RefreshPage> {
       //other
       lastDateTime: lastDateTime,
       //updated when messing with sliver
+      addingDose: addingDose,
       theSelectedDateTime: theSelectedDateTime,
       //data
       dosesVN: dosesVN,
       doseIDtoActiveDoseVN: doseIDtoActiveDoseVN,
       halfLife: halfLife,
+    );
+
+    double pillSize = 72;
+    Widget addDoseBox = AddDoseField(
+      pillSize: pillSize, 
+      addingDose: addingDose,
+      dosesVN: dosesVN,
     );
 
     //generate group widgets
@@ -186,57 +199,46 @@ class _RefreshPageState extends State<RefreshPage> {
     //sliver
     List<Widget> slivers = new List<Widget>();
     slivers.add(sliverAppBar);
+    slivers.add(addDoseBox);
     slivers.addAll(groups);
     slivers.add(fillRemainingSliver);
 
     //build
-    return Stack(
-      children: <Widget>[
-        Container(
-          color: ThemeData.dark().primaryColorDark,
-          child: SmartRefresher(
-            scrollController: widget.autoScrollController,
-            physics: BouncingScrollPhysics(),
-            //no footer animation
-            enablePullUp: false,
-            //yes header animation
-            enablePullDown: true,
-            header: WaterDropMaterialHeader(
-              offset: chartHeight + appBarHeight,
-              backgroundColor: Theme.of(context).accentColor,
-              color: ThemeData.dark().scaffoldBackgroundColor,
-            ),
-            controller: refreshController,
-            onRefresh: () async {
-              updateDateTime();
-              // monitor network fetch
-              await Future.delayed(loadTime);
-              // if failed,use refreshFailed()
-              refreshController.refreshCompleted();
-            },
-            onLoading: () async {
-              updateDateTime();
-              // monitor network fetch
-              await Future.delayed(loadTime);
-              // if failed,use loadFailed(),if no data return,use LoadNodata()
-              refreshController.loadComplete();
-            },
-            child: CustomScrollView(
-              physics: BouncingScrollPhysics(),
-              controller: widget.autoScrollController,
-              slivers: slivers,
-            ),
-          ),
+    return Container(
+      color: ThemeData.dark().primaryColorDark,
+      child: SmartRefresher(
+        scrollController: widget.autoScrollController,
+        physics: BouncingScrollPhysics(),
+        //no footer animation
+        enablePullUp: false,
+        //yes header animation
+        enablePullDown: true,
+        header: WaterDropMaterialHeader(
+          offset: chartHeight + appBarHeight,
+          backgroundColor: Theme.of(context).accentColor,
+          color: ThemeData.dark().scaffoldBackgroundColor,
         ),
-        Visibility(
-          visible: false,
-          child: OriginalGoldenRatioGuide(
-            statusBarHeight: statusBarHeight,
-            appBarHeight: appBarHeight,
-            chartHeight: chartHeight,
-          ),
+        controller: refreshController,
+        onRefresh: () async {
+          updateDateTime();
+          // monitor network fetch
+          await Future.delayed(loadTime);
+          // if failed,use refreshFailed()
+          refreshController.refreshCompleted();
+        },
+        onLoading: () async {
+          updateDateTime();
+          // monitor network fetch
+          await Future.delayed(loadTime);
+          // if failed,use loadFailed(),if no data return,use LoadNodata()
+          refreshController.loadComplete();
+        },
+        child: CustomScrollView(
+          physics: BouncingScrollPhysics(),
+          controller: widget.autoScrollController,
+          slivers: slivers,
         ),
-      ],
+      ),
     );
   }
 
@@ -313,41 +315,5 @@ class _RefreshPageState extends State<RefreshPage> {
       }
     }
     doseIDtoActiveDoseVN.value = doseIDtoActiveDose;
-  }
-}
-
-class OriginalGoldenRatioGuide extends StatelessWidget {
-  const OriginalGoldenRatioGuide({
-    Key key,
-    @required this.statusBarHeight,
-    @required this.appBarHeight,
-    @required this.chartHeight,
-  }) : super(key: key);
-
-  final double statusBarHeight;
-  final double appBarHeight;
-  final double chartHeight;
-
-  @override
-  Widget build(BuildContext context) {
-    return Opacity(
-        opacity: 0.5,
-        child: Column(children: [
-          Container(
-            height: statusBarHeight,
-            width: MediaQuery.of(context).size.width,
-            color: Colors.red,
-          ),
-          Container(
-            height: appBarHeight,
-            width: MediaQuery.of(context).size.width,
-            color: Colors.green,
-          ),
-          Container(
-            height: chartHeight,
-            width: MediaQuery.of(context).size.width,
-            color: Colors.blue,
-          ),
-        ]));
   }
 }

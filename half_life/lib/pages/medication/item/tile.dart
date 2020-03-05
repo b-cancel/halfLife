@@ -7,7 +7,7 @@ import 'package:vector_math/vector_math_64.dart' as vect;
 //internal
 import 'package:half_life/pages/medication/item/options.dart';
 import 'package:half_life/pages/medication/item/pill.dart';
-import 'package:half_life/pages/medication/item/arrow.dart';
+import 'package:half_life/shared/rotatingIcon.dart';
 import 'package:half_life/shared/tileDivider.dart';
 import 'package:half_life/shared/timeOfDay.dart';
 

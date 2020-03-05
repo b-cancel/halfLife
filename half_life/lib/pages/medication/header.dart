@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:half_life/doseChart.dart';
 import 'package:half_life/halfLifeChanger.dart';
+import 'package:half_life/pages/medication/add/buttons.dart';
 import 'package:half_life/struct/doses.dart';
 
 class HeaderSliver extends StatefulWidget {
@@ -11,6 +12,7 @@ class HeaderSliver extends StatefulWidget {
     @required this.accentHeight,
     @required this.bottomBarHeight,
     //other
+    @required this.addingDose,
     @required this.theSelectedDateTime,
     @required this.lastDateTime,
     @required this.dosesVN,
@@ -23,10 +25,11 @@ class HeaderSliver extends StatefulWidget {
   final double accentHeight;
   final double bottomBarHeight;
   //other
+  final ValueNotifier<bool> addingDose;
   final ValueNotifier<DateTime> theSelectedDateTime;
   final ValueNotifier<DateTime> lastDateTime;
   final ValueNotifier<List<Dose>> dosesVN;
-  final ValueNotifier<Map<int,double>> doseIDtoActiveDoseVN;
+  final ValueNotifier<Map<int, double>> doseIDtoActiveDoseVN;
   final ValueNotifier<Duration> halfLife;
 
   @override
@@ -35,12 +38,14 @@ class HeaderSliver extends StatefulWidget {
 
 class _HeaderSliverState extends State<HeaderSliver> {
   //eventually object updaters
-  final TextEditingController textCtrl = new TextEditingController(text: "Fluvoxamine");
+  final TextEditingController textCtrl =
+      new TextEditingController(text: "Fluvoxamine");
 
   //build
   @override
   Widget build(BuildContext context) {
-    double flexibleHeight = widget.accentHeight; //the bottom bar is included here
+    double flexibleHeight =
+        widget.accentHeight; //the bottom bar is included here
     //add extra space for visual elements that wont be the accent color
     //flexibleHeight += widget.statusBarHeight; //equivalent to bottom buttons not factored into ratio
     flexibleHeight += widget.appBarHeight;
@@ -93,8 +98,8 @@ class _HeaderSliverState extends State<HeaderSliver> {
                   child: IconButton(
                     icon: Icon(
                       Icons.chevron_left,
-                    ), 
-                    onPressed: (){
+                    ),
+                    onPressed: () {
                       print("back to medication list");
                     },
                   ),
@@ -126,11 +131,8 @@ class _HeaderSliverState extends State<HeaderSliver> {
                       tileMode: TileMode.repeated,
                     ),
                   ),
-                  child: IconButton(
-                    icon: Icon(Icons.add),
-                    onPressed: () {
-                      print("add dose");
-                    },
+                  child: DoseAddButtons(
+                    addingDose: widget.addingDose,
                   ),
                 ),
               ),
@@ -235,7 +237,7 @@ class _HeaderSliverState extends State<HeaderSliver> {
                             hintText: 'Medication Name',
                           ),
                           //only 1 line at all times
-                          expands: false, 
+                          expands: false,
                           minLines: 1,
                           maxLines: 1,
                         ),
