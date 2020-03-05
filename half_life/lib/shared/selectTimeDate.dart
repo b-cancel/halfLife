@@ -49,7 +49,7 @@ Future<DateTime> selectTimeDate(BuildContext context, DateTime initialDate) asyn
     onLeftBtn: () async {
       DateTime datePicked = await showRoundedDatePicker(
         context: context,
-        initialDate: initialDate,
+        initialDate: selectedDate.value,
         theme: themeForPopUps,
         firstDate: DateTime(DateTime.now().year - 1),
         lastDate: DateTime.now(),
@@ -73,9 +73,8 @@ Future<DateTime> selectTimeDate(BuildContext context, DateTime initialDate) asyn
 
       //update the selected date
       if(datePicked != null){
-        selectedDate.value;
+        selectedDate.value = datePicked;
       }
-      else selectedDate.value = datePicked;
     }
   );
 

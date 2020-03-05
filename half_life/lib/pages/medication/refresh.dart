@@ -185,12 +185,17 @@ class _RefreshPageState extends State<RefreshPage> {
       fillOverscroll: true, //only if above is false
       child: Container(
         color: ThemeData.dark().scaffoldBackgroundColor,
-        child: Center(
-          child: Padding(
-            padding: EdgeInsets.all(32.0),
-            child: Icon(
-              FontAwesomeIcons.prescriptionBottle,
-              color: Colors.white,
+        child: Visibility(
+          //since to scroll to top button already has the desired effect
+          //TODO: we might want to show an icon of sorts when there are no list items to show
+          visible: false, 
+          child: Center(
+            child: Padding(
+              padding: EdgeInsets.all(32.0),
+              child: Icon(
+                FontAwesomeIcons.prescriptionBottle,
+                color: Colors.white,
+              ),
             ),
           ),
         ),

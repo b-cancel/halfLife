@@ -9,6 +9,21 @@ class DateTimeFormat{
     7: "Sunday",
   };
 
+  static Map<int,String> monthToStringShort = {
+    1: "Jan",
+    2: "Feb",
+    3: "Mar",
+    4: "Apr",
+    5: "May",
+    6: "June",
+    7: "July",
+    8: "Aug",
+    9: "Sept",
+    10: "Oct",
+    11: "Nov",
+    12: "Dec",
+  };
+
   static Map<int,String> monthToString = {
     1: "January",
     2: "February",

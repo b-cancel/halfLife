@@ -295,7 +295,6 @@ class _DateTimeSelectorState extends State<DateTimeSelector> {
     DateTime displayDT = widget.newDateTime.value;
     int hourAdjusted = displayDT.hour;
     bool isAM = hourAdjusted < 12;
-    print("hour: " + hourAdjusted.toString());
     if(isAM){
       if(hourAdjusted == 0){
         hourAdjusted = 12;
@@ -306,7 +305,6 @@ class _DateTimeSelectorState extends State<DateTimeSelector> {
         hourAdjusted -= 12;
       }
     }
-    print("hour af: " + hourAdjusted.toString());
     int minute = displayDT.minute;
     int zerosToAdd = 2 - minute.toString().length;
     String zeros = (zerosToAdd == 0) ? "" : (zerosToAdd == 1 ? "0" : "00");
@@ -355,33 +353,26 @@ class _DateTimeSelectorState extends State<DateTimeSelector> {
                 DaysAgo(
                   dateTime: displayDT,
                 ),
-                Row(
-                  children: [
-                    Text(
-                      "On ",
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.white,
-                      ),
-                    ),
-                    RichText(
+                RichText(
                       text: TextSpan(
                         children: [
+                          TextSpan(
+                            text: "On ",
+                          ),
                           TextSpan(
                             text: DateTimeFormat.weekDayToString[displayDT.weekday],
                             style: bold,
                           ),
+                          TextSpan(
+                            text: " the",
+                          ),
                         ],
                       ),
                     ),
-                  ],
-                ),
                 RichText(
                   text: TextSpan(
                     children: [
-                      TextSpan(
-                        text: "the ",
-                      ),
+                      
                       TextSpan(
                         text: displayDT.day.toString(),
                         style: bold,
@@ -393,6 +384,15 @@ class _DateTimeSelectorState extends State<DateTimeSelector> {
                       ),
                       TextSpan(
                         text: " of ",
+                      ),
+                      TextSpan(
+                        text: DateTimeFormat.monthToStringShort[
+                          displayDT.month
+                        ],
+                        style: bold,
+                      ),
+                      TextSpan(
+                        text: ", ",
                       ),
                       TextSpan(
                         text: displayDT.year.toString(),
@@ -464,7 +464,7 @@ class DaysAgo extends StatelessWidget {
               ),
             ),
             TextSpan(
-              text: " days ago",
+              text: " day" + ((daysAgo != 1) ? "s" : "") + " ago",
             )
           ],
         ),
