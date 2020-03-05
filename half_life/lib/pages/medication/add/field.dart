@@ -293,21 +293,6 @@ class _DateTimeSelectorState extends State<DateTimeSelector> {
   @override
   Widget build(BuildContext context) {
     DateTime displayDT = widget.newDateTime.value;
-    int hourAdjusted = displayDT.hour;
-    bool isAM = hourAdjusted < 12;
-    if(isAM){
-      if(hourAdjusted == 0){
-        hourAdjusted = 12;
-      }
-    }
-    else{
-      if(hourAdjusted != 12){
-        hourAdjusted -= 12;
-      }
-    }
-    int minute = displayDT.minute;
-    int zerosToAdd = 2 - minute.toString().length;
-    String zeros = (zerosToAdd == 0) ? "" : (zerosToAdd == 1 ? "0" : "00");
 
     //styling
     TextStyle bold = TextStyle(
@@ -350,80 +335,147 @@ class _DateTimeSelectorState extends State<DateTimeSelector> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                DaysAgo(
-                  dateTime: displayDT,
-                ),
-                RichText(
-                      text: TextSpan(
-                        children: [
-                          TextSpan(
-                            text: "On ",
-                          ),
-                          TextSpan(
-                            text: DateTimeFormat.weekDayToString[displayDT.weekday],
-                            style: bold,
-                          ),
-                          TextSpan(
-                            text: " the",
-                          ),
-                        ],
-                      ),
-                    ),
-                RichText(
-                  text: TextSpan(
-                    children: [
-                      
-                      TextSpan(
-                        text: displayDT.day.toString(),
-                        style: bold,
-                      ),
-                      TextSpan(
-                        text: DateTimeFormat.daySuffix(
-                          displayDT.day,
-                        ),
-                      ),
-                      TextSpan(
-                        text: " of ",
-                      ),
-                      TextSpan(
-                        text: DateTimeFormat.monthToStringShort[
-                          displayDT.month
-                        ],
-                        style: bold,
-                      ),
-                      TextSpan(
-                        text: ", ",
-                      ),
-                      TextSpan(
-                        text: displayDT.year.toString(),
-                        style: bold,
-                      ),
-                    ],
+                  DaysAgo(
+                    dateTime: displayDT,
                   ),
-                ),
-                RichText(
-                  text: TextSpan(
-                    children: [
-                      TextSpan(
-                        text: "at ",
-                      ),
-                      TextSpan(
-                        text:  hourAdjusted.toString() 
-                        + ":" 
-                        + zeros
-                        + minute.toString(),
-                        style: bold,
-                      ),
-                      TextSpan(
-                        text: isAM ? " am" : " pm",
-                      ),
-                    ],
+                  WeekDay(
+                    dateTime: displayDT,
                   ),
-                ),
-              ],)
+                  DayMonthYear(
+                    dateTime: displayDT,
+                  ),
+                  TimeThatDay(
+                    dateTime: displayDT,
+                  ),
+                ],
+              ),
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class WeekDay extends StatelessWidget {
+  const WeekDay({
+    Key key,
+    @required this.dateTime,
+  }) : super(key: key);
+
+  final DateTime dateTime;
+
+  @override
+  Widget build(BuildContext context) {
+    return RichText(
+      text: TextSpan(
+        children: [
+          TextSpan(
+            text: "On ",
+          ),
+          TextSpan(
+            text: DateTimeFormat.weekDayToString[dateTime.weekday],
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          TextSpan(
+            text: " the",
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class DayMonthYear extends StatelessWidget {
+  const DayMonthYear({
+    Key key,
+    @required this.dateTime,
+  }) : super(key: key);
+
+  final DateTime dateTime;
+
+  @override
+  Widget build(BuildContext context) {
+    TextStyle bold = TextStyle(
+      fontWeight: FontWeight.bold,
+    );
+
+    //build
+    return RichText(
+      text: TextSpan(
+        children: [
+          TextSpan(
+            text: dateTime.day.toString(),
+            style: bold,
+          ),
+          TextSpan(
+            text: DateTimeFormat.daySuffix(
+              dateTime.day,
+            ),
+          ),
+          TextSpan(
+            text: " of ",
+          ),
+          TextSpan(
+            text: DateTimeFormat.monthToStringShort[dateTime.month],
+            style: bold,
+          ),
+          TextSpan(
+            text: ", ",
+          ),
+          TextSpan(
+            text: dateTime.year.toString(),
+            style: bold,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class TimeThatDay extends StatelessWidget {
+  const TimeThatDay({
+    Key key,
+    @required this.dateTime,
+  }) : super(key: key);
+
+  final DateTime dateTime;
+
+  @override
+  Widget build(BuildContext context) {
+    int hourAdjusted = dateTime.hour;
+    bool isAM = hourAdjusted < 12;
+    if (isAM) {
+      if (hourAdjusted == 0) {
+        hourAdjusted = 12;
+      }
+    } else {
+      if (hourAdjusted != 12) {
+        hourAdjusted -= 12;
+      }
+    }
+    int minute = dateTime.minute;
+    int zerosToAdd = 2 - minute.toString().length;
+    String zeros = (zerosToAdd == 0) ? "" : (zerosToAdd == 1 ? "0" : "00");
+
+    return RichText(
+      text: TextSpan(
+        children: [
+          TextSpan(
+            text: "at ",
+          ),
+          TextSpan(
+            text: hourAdjusted.toString() + ":" + zeros + minute.toString(),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          TextSpan(
+            text: isAM ? " am" : " pm",
+          ),
+        ],
       ),
     );
   }

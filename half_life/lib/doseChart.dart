@@ -259,7 +259,7 @@ class _HeaderChartState extends State<HeaderChart> {
               changedListener: (charts.SelectionModel model) {
                 final selectedDatum = model.selectedDatum;
                 if (selectedDatum.isNotEmpty) {
-                  DateTime thisDateTime = selectedDatum.first.datum.timeStamp;
+                  DateTime thisDateTime = selectedDatum.first.datum.dateTime;
                   double activeDosage = selectedDatum.first.datum.value;
                   //set to the selected point
                   selectedDateTime.value = thisDateTime;

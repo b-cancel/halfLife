@@ -1,6 +1,9 @@
 //flutter
 import 'package:flutter/material.dart';
+
+//plugin
 import 'package:flutter_villains/villain.dart';
+import 'package:bot_toast/bot_toast.dart';
 
 //internal
 import 'package:half_life/pages/medication/page.dart';
@@ -132,19 +135,22 @@ class MyApp extends StatelessWidget {
     medication.doses = doses;
 
     //build
-    return MaterialApp(
-      title: 'Half Life',
-      navigatorObservers: [
-        VillainTransitionObserver(),
-      ],
-      theme: ThemeData.light().copyWith(
-        accentColor: Color(0xFF64ffda),
-        textSelectionColor: ThemeData.dark().cardColor,
-        //NOTE: you can only set this once aparently
-        textSelectionHandleColor: Colors.white,
-      ),
-      home: AMedicationPage(
-        medication: medication,
+    return BotToastInit(
+      child: MaterialApp(
+        title: 'Half Life',
+        navigatorObservers: [
+          VillainTransitionObserver(),
+          BotToastNavigatorObserver(),
+        ],
+        theme: ThemeData.light().copyWith(
+          accentColor: Color(0xFF64ffda),
+          textSelectionColor: ThemeData.dark().cardColor,
+          //NOTE: you can only set this once aparently
+          textSelectionHandleColor: Colors.white,
+        ),
+        home: AMedicationPage(
+          medication: medication,
+        ),
       ),
     );
   }

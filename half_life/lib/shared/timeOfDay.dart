@@ -1,14 +1,16 @@
+import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
+import 'package:half_life/pages/medication/add/field.dart';
 
 class ToTimeOfDay extends StatelessWidget {
   ToTimeOfDay({
     @required this.timeStamp,
-    this.addBack: true,
+    this.popUpToRight: true,
   });
 
   final DateTime timeStamp;
-  final bool addBack;
+  final bool popUpToRight;
 
   @override
   Widget build(BuildContext context) {
@@ -106,41 +108,83 @@ class ToTimeOfDay extends StatelessWidget {
     }
 
     //add proper background color
-    if (addBack) {
-      if (hour < 5) {
-        icon = CircleAvatar(
-          backgroundColor: ThemeData.dark().scaffoldBackgroundColor,
-          foregroundColor: Colors.white,
-          child: icon,
-        );
-      } else if (hour < 8) {
-        icon = CircleAvatar(
-          backgroundColor: Color(0xFFffb347), //orange
-          foregroundColor: ThemeData.dark().scaffoldBackgroundColor,
-          child: icon,
-        );
-      } else if (hour < 17) {
-        icon = CircleAvatar(
-          backgroundColor: Color(0xFF4793ff), //blue
-          foregroundColor: Colors.white,
-          child: icon,
-        );
-      } else if (hour < 20) {
-        icon = CircleAvatar(
-          backgroundColor: Color(0xFFffb347), //orange
-          foregroundColor: ThemeData.dark().scaffoldBackgroundColor,
-          child: icon,
-        );
-      } else {
-        icon = CircleAvatar(
-          backgroundColor: ThemeData.dark().scaffoldBackgroundColor,
-          foregroundColor: Colors.white,
-          child: icon,
-        );
-      }
+    if (hour < 5) {
+      icon = CircleAvatar(
+        backgroundColor: ThemeData.dark().scaffoldBackgroundColor,
+        foregroundColor: Colors.white,
+        child: icon,
+      );
+    } else if (hour < 8) {
+      icon = CircleAvatar(
+        backgroundColor: Color(0xFFffb347), //orange
+        foregroundColor: ThemeData.dark().scaffoldBackgroundColor,
+        child: icon,
+      );
+    } else if (hour < 17) {
+      icon = CircleAvatar(
+        backgroundColor: Color(0xFF4793ff), //blue
+        foregroundColor: Colors.white,
+        child: icon,
+      );
+    } else if (hour < 20) {
+      icon = CircleAvatar(
+        backgroundColor: Color(0xFFffb347), //orange
+        foregroundColor: ThemeData.dark().scaffoldBackgroundColor,
+        child: icon,
+      );
+    } else {
+      icon = CircleAvatar(
+        backgroundColor: ThemeData.dark().scaffoldBackgroundColor,
+        foregroundColor: Colors.white,
+        child: icon,
+      );
     }
 
     //return icon
-    return icon;
+    return IconButton(
+      padding: EdgeInsets.all(0),
+      visualDensity: VisualDensity.compact,
+      onPressed: () {
+        BotToast.showAttachedWidget(
+          targetContext: context,
+          onlyOne: true,
+          allowClick: true,
+          enableSafeArea: true,
+          preferDirection: popUpToRight
+              ? PreferDirection.rightCenter
+              : PreferDirection.bottomCenter,
+          horizontalOffset: popUpToRight ? 12 : 0,
+          verticalOffset: popUpToRight ? 0 : 12,
+          duration: Duration(seconds: 5),
+          attachedBuilder: (_) => Theme(
+            data: ThemeData.dark(),
+            child: GestureDetector(
+              onTap: () => BotToast.cleanAll(),
+              child: Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: popUpToRight
+                        ? CrossAxisAlignment.start
+                        : CrossAxisAlignment.center,
+                    children: [
+                      DaysAgo(
+                        dateTime: timeStamp,
+                      ),
+                      TimeThatDay(
+                        dateTime: timeStamp,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+      icon: icon,
+      iconSize: 24,
+    );
   }
 }
