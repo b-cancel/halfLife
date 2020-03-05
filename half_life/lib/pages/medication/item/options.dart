@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_rounded_date_picker/rounded_picker.dart';
-import 'package:flutter_rounded_date_picker/src/material_rounded_date_picker_style.dart';
-import 'package:flutter_rounded_date_picker/src/material_rounded_year_picker_style.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:half_life/shared/playOnceGif.dart';
+import 'package:half_life/shared/selectTimeDate.dart';
 import 'package:half_life/utils/dateTimeFormat.dart';
 
 class Options extends StatelessWidget {
@@ -62,73 +60,8 @@ class Options extends StatelessWidget {
                       color: Colors.white,
                     ),
                     onPressed: () async {
-                      //just to comply with material color standards I guess
-                      Map<int, Color> color = {
-                        50: Color.fromRGBO(30, 30, 30, 1),
-                        100: Color.fromRGBO(30, 30, 30, 1),
-                        200: Color.fromRGBO(30, 30, 30, 1),
-                        300: Color.fromRGBO(30, 30, 30, 1),
-                        400: Color.fromRGBO(30, 30, 30, 1),
-                        500: Color.fromRGBO(30, 30, 30, 1),
-                        600: Color.fromRGBO(30, 30, 30, 1),
-                        700: Color.fromRGBO(30, 30, 30, 1),
-                        800: Color.fromRGBO(30, 30, 30, 1),
-                        900: Color.fromRGBO(30, 30, 30, 1),
-                      };
-
-                      //the theme for both pop ups
-                      ThemeData themeForPopUps = ThemeData(
-                        //color of buttons
-                        //A.K.A. ThemeData.dark().scaffoldBackgroundColor,
-                        //A.K.A. Color(0xFF303030),
-                        primarySwatch: MaterialColor(0xFF303030, color),
-                        //circle highlight
-                        accentColor: Theme.of(context).accentColor,
-                        //banner color
-                        primaryColor: ThemeData.dark().scaffoldBackgroundColor,
-                        //color of text inside circle highlight
-                        accentTextTheme: TextTheme(
-                          bodyText1: TextStyle(
-                            color: ThemeData.dark().scaffoldBackgroundColor,
-                          ),
-                        ),
-                      );
-
-                      //pick day
-                      DateTime newDateTime = await showRoundedDatePicker(
-                        context: context,
-                        initialDate: initialDate,
-                        theme: themeForPopUps,
-                        firstDate: DateTime(DateTime.now().year - 1),
-                        lastDate: DateTime.now(),
-                        initialDatePickerMode: DatePickerMode.day,
-                        styleYearPicker: MaterialRoundedYearPickerStyle(
-                          textStyleYearSelected: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: ThemeData.dark().primaryColorDark,
-                            fontSize: 36,
-                          ),
-                          textStyleYear: TextStyle(
-                            fontWeight: FontWeight.normal,
-                            color: ThemeData.dark().primaryColorLight,
-                            fontSize: 24,
-                          ),
-                        ),
-                        description: "When Was The Dose Taken",
-                        barrierDismissible: true,
-                        borderRadius: 16,
-                      );
-
-                      //pick time of day
-                      if (newDateTime != null) {
-                        TimeOfDay time = await showRoundedTimePicker(
-                          context: context,
-                          initialTime: TimeOfDay.fromDateTime(newDateTime),
-                          theme: themeForPopUps,
-                          barrierDismissible: true,
-                          borderRadius: 16,
-                        );
-                      }
+                      DateTime newDT = await selectTimeDate(context, initialDate);
+                      print("***********new date time: " + newDT.toString());
                     },
                   ),
                 ),
