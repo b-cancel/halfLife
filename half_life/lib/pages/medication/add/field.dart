@@ -30,12 +30,13 @@ class _AddDoseFieldState extends State<AddDoseField> {
 
       //we don't want to add it or already did
       if(widget.addingDose.value == false){
-        //close keyboard
         FocusScope.of(context).unfocus();
-        //clear data
-        newDoseController.clear();
       }
       else{
+        //clear data
+        newDoseController.clear();
+
+        //focus on the field
         FocusScope.of(context).requestFocus(focusNode);
       }
       
@@ -54,6 +55,13 @@ class _AddDoseFieldState extends State<AddDoseField> {
       }
     }
 
+    //create new list of doses (with space for new dose)
+    List<Dose> oldDoses = widget.dosesVN.value;
+    List<Dose> newDoses = new List<Dose>(oldDoses.length + 1);
+    for(int i = 0; i < oldDoses.length; i++){
+      newDoses[i] = oldDoses[i];
+    }
+
     //create dose
     int newID = largestID + 1;
     String newValue = newDoseController.text;
@@ -64,11 +72,11 @@ class _AddDoseFieldState extends State<AddDoseField> {
       DateTime.now(),
     );
 
-    //create new list of doses
-    List<Dose> newDoses = widget.dosesVN.value;
-    newDoses.add(theNewDose);
+    
+    //DONT use add it messes up on fixed length lits
+    newDoses[oldDoses.length] = theNewDose;
 
-    //notify everythign
+    //notify everything
     widget.dosesVN.value = newDoses;
 
     //close ourselves
@@ -194,7 +202,7 @@ class _AddDoseFieldState extends State<AddDoseField> {
                                   minLines: 1,
                                   maxLines: 1,
                                   //on complete
-                                  onEditingComplete: () => saveDose(),
+                                  //onEditingComplete: () => saveDose(),
                                   onSubmitted: (str) => saveDose(),
                                 ),
                               ],

@@ -76,6 +76,7 @@ class _RefreshPageState extends State<RefreshPage> {
   }
 
   updateState() {
+    print("********half life or doses changed");
     updateGroups();
     if (mounted) {
       setState(() {});

@@ -15,7 +15,7 @@ class Dose{
   }
 
   toString(){
-    return value.toString() + " @ " + timeStamp.toString();
+    return id.toString() + ": " + value.toString() + " @ " + timeStamp.toString();
   }
 
   Dose(
