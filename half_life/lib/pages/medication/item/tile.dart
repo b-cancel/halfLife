@@ -147,7 +147,7 @@ class _DoseTileState extends State<DoseTile> {
                 dose: widget.dose,
               ),
               trailing: RotatingIcon(
-                color: ThemeData.dark().scaffoldBackgroundColor, 
+                color: ThemeData.dark().scaffoldBackgroundColor,
                 duration: animationDuration,
                 isOpen: isOpening,
               ),
@@ -184,9 +184,14 @@ class _DoseTileState extends State<DoseTile> {
                 fit: StackFit.passthrough,
                 overflow: Overflow.visible,
                 children: [
-                  Corners(
-                    animationDuration: animationDuration,
-                    isOpen: isOpening,
+                  Positioned(
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    child: Container(
+                      height: 24,
+                      color: ThemeData.dark().cardColor,
+                    ),
                   ),
                   AnimatedContainer(
                     duration: animationDuration,
@@ -215,38 +220,6 @@ class _DoseTileState extends State<DoseTile> {
             ],
           );
         },
-      ),
-    );
-  }
-}
-
-class Corners extends StatelessWidget {
-  const Corners({
-    Key key,
-    @required this.animationDuration,
-    @required this.isOpen,
-  }) : super(key: key);
-
-  final Duration animationDuration;
-  final ValueNotifier<bool> isOpen;
-
-  @override
-  Widget build(BuildContext context) {
-    return Positioned(
-      bottom: 0,
-      left: 0,
-      right: 0,
-      child: AnimatedContainer(
-        duration: animationDuration,
-        transform: Matrix4.translation(
-          vect.Vector3(
-            0,
-            isOpen.value ? 0 : -24,
-            0,
-          ),
-        ),
-        height: 36,
-        color: ThemeData.dark().cardColor,
       ),
     );
   }

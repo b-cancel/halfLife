@@ -1,9 +1,15 @@
+//flutter
 import 'package:flutter/material.dart';
+
+//plugin
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:half_life/shared/playOnceGif.dart';
+
+//internal
+import 'package:half_life/pages/medication/item/delete.dart';
 import 'package:half_life/shared/selectTimeDate.dart';
 import 'package:half_life/utils/dateTimeFormat.dart';
 
+//widget
 class Options extends StatelessWidget {
   const Options({
     Key key,
@@ -39,7 +45,7 @@ class Options extends StatelessWidget {
                       FontAwesomeIcons.pills,
                       color: Theme.of(context).accentColor,
                     ),
-                    onPressed: (){
+                    onPressed: () {
                       print("change dosage");
                     },
                   ),
@@ -60,7 +66,8 @@ class Options extends StatelessWidget {
                       color: Colors.white,
                     ),
                     onPressed: () async {
-                      DateTime newDT = await selectTimeDate(context, initialDate);
+                      DateTime newDT =
+                          await selectTimeDate(context, initialDate);
                       print("***********new date time: " + newDT.toString());
                     },
                   ),
@@ -82,161 +89,7 @@ class Options extends StatelessWidget {
                       size: 36,
                     ),
                     onPressed: () async {
-                      showDialog<void>(
-                        context: context,
-                        barrierDismissible: true,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            shape: RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(12.0)),
-                            ),
-                            contentPadding: EdgeInsets.all(0),
-                            content: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: <Widget>[
-                                Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.red,
-                                    borderRadius: new BorderRadius.only(
-                                      topLeft: const Radius.circular(12.0),
-                                      topRight: const Radius.circular(12.0),
-                                    ),
-                                  ),
-                                  child: Padding(
-                                    padding: EdgeInsets.only(
-                                      bottom: 36,
-                                      top: 24,
-                                    ),
-                                    child: Container(
-                                      height: 140,
-                                      child: PlayGifOnce(
-                                        assetName: "assets/delete.gif",
-                                        runTimeMS: 6120,
-                                        frameCount: 98,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                    top: 16.0,
-                                  ),
-                                  child: Container(
-                                    alignment: Alignment.center,
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 16,
-                                    ),
-                                    child: DefaultTextStyle(
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 26,
-                                        color: Colors.black,
-                                      ),
-                                      child: Text("Delete The Dose?"),
-                                    ),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 24.0,
-                                  ),
-                                  child: Padding(
-                                    padding: EdgeInsets.only(
-                                      top: 8.0,
-                                      bottom: 16,
-                                    ),
-                                    child: Column(
-                                      children: <Widget>[
-                                        Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Stack(
-                                          children: <Widget>[
-                                            RichText(
-                                              text: TextSpan(
-                                                style: TextStyle(
-                                                  color: ThemeData.dark().scaffoldBackgroundColor,
-                                                  fontSize: 18,
-                                                ),
-                                                children: [
-                                                  TextSpan(
-                                                    text: "Of ",
-                                                  ),
-                                                  TextSpan(
-                                                    text: dose.round().toString(),
-                                                    style: TextStyle(
-                                                      fontWeight: FontWeight.bold,
-                                                      fontSize: 24,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                            Positioned(
-                                              right: 0,
-                                              bottom: 0,
-                                              child: Transform.translate(
-                                                offset: Offset(8, 2),
-                                                child: Text(
-                                                  "u",
-                                                  style: TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        Text(
-                                          "   taken on",
-                                          style: TextStyle(
-                                            fontSize: 18,
-                                          ),
-                                        ),
-                                          ],
-                                        ),
-                                        
-                                        WeekDayYear(
-                                          dateTime: initialDate,
-                                          showYear: true,
-                                        ),
-                                        
-                                      ],
-                                    ),
-                                  )
-                                ),
-                              ],
-                            ),
-                            actions: <Widget>[
-                              FlatButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                                child: Text(
-                                  "Cancel",
-                                  style: TextStyle(
-                                    color: ThemeData.dark().scaffoldBackgroundColor,
-                                  ),
-                                ),
-                              ),
-                              RaisedButton(
-                                color: Colors.red,
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                                child: Text(
-                                  "Delete",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          );
-                        },
-                      );
+                      deleteDose(context, dose, initialDate);
                     },
                   ),
                 ),
@@ -268,38 +121,35 @@ class WeekDayYear extends StatelessWidget {
     //build
     return RichText(
       text: TextSpan(
-        style: TextStyle(
-          color: ThemeData.dark().scaffoldBackgroundColor,
-          fontSize: showYear ? null : 16,
-        ),
-        children: [
-          TextSpan(
-            text: DateTimeFormat.weekDayToString[
-              dateTime.weekday
-            ],
-            style: bold,
+          style: TextStyle(
+            color: ThemeData.dark().scaffoldBackgroundColor,
+            fontSize: showYear ? null : 16,
           ),
-          TextSpan(
-            text: " the ",
-          ),
-          TextSpan(
-            text: dateTime.day.toString(),
-            style: bold,
-          ),
-          TextSpan(
-            text: DateTimeFormat.daySuffix(
-              dateTime.day,
+          children: [
+            TextSpan(
+              text: DateTimeFormat.weekDayToString[dateTime.weekday],
+              style: bold,
             ),
-          ),
-          TextSpan(
-            text: showYear ? ", " : "",
-          ),
-          TextSpan(
-            text: showYear ? dateTime.year.toString() : "",
-            style: bold,
-          ),
-        ]
-      ),
+            TextSpan(
+              text: " the ",
+            ),
+            TextSpan(
+              text: dateTime.day.toString(),
+              style: bold,
+            ),
+            TextSpan(
+              text: DateTimeFormat.daySuffix(
+                dateTime.day,
+              ),
+            ),
+            TextSpan(
+              text: showYear ? ", " : "",
+            ),
+            TextSpan(
+              text: showYear ? dateTime.year.toString() : "",
+              style: bold,
+            ),
+          ]),
     );
   }
 }

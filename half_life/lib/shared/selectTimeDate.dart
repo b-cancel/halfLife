@@ -43,7 +43,7 @@ Future<DateTime> selectTimeDate(BuildContext context, DateTime initialDate) asyn
     context: context,
     initialTime: TimeOfDay.fromDateTime(initialDate),
     theme: themeForPopUps,
-    barrierDismissible: true,
+    barrierDismissible: false,
     borderRadius: 16,
     leftBtn: "Change Date",
     onLeftBtn: () async {
@@ -52,7 +52,7 @@ Future<DateTime> selectTimeDate(BuildContext context, DateTime initialDate) asyn
         initialDate: selectedDate.value,
         theme: themeForPopUps,
         firstDate: DateTime(DateTime.now().year - 1),
-        lastDate: DateTime.now(),
+        lastDate: DateTime(DateTime.now().year + 1),
         initialDatePickerMode: DatePickerMode.day,
         styleYearPicker: MaterialRoundedYearPickerStyle(
           textStyleYearSelected: TextStyle(
@@ -67,7 +67,7 @@ Future<DateTime> selectTimeDate(BuildContext context, DateTime initialDate) asyn
           ),
         ),
         description: "When Was The Dose Taken",
-        barrierDismissible: true,
+        barrierDismissible: false,
         borderRadius: 16,
       );
 
