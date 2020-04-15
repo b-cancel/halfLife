@@ -25,15 +25,13 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.3
 
-  
-
   #in use
   font_awesome_flutter: ^8.7.0
   flutter_sticky_header: ^0.4.0 
   charts_flutter: ^0.8.1
   pull_to_refresh: ^1.5.8
   flutter_icons: ^1.0.0+1
-  scroll_to_index: ^1.0.5
+  scroll_to_index: ^1.0.6
   flutter_rounded_date_picker: ^1.0.3
   flutter_gifimage: ^1.0.1 
   animator: ^1.0.0+5

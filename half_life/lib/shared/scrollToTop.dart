@@ -26,7 +26,7 @@ class ScrollToTopButton extends StatefulWidget {
 
 class _ScrollToTopButtonState extends State<ScrollToTopButton> {
   int keyboardSubscriberID;
-  bool keyboardVisible;
+  bool keyboardVisible = false;
 
   updateState(){
     if(mounted) setState((){});

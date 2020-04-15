@@ -115,12 +115,72 @@ class MyApp extends StatelessWidget {
       ),
     );
     startID++;
+
+    //test
+    doses.add(
+      Dose(
+        startID,
+        35,
+        DateTime(
+          2020,
+          4, //month
+          5, //day
+          5, //time
+        ),
+      ),
+    );
+    startID++;
+
+    //test
+    doses.add(
+      Dose(
+        startID,
+        65,
+        DateTime(
+          2020,
+          4, //month
+          7, //day
+          5, //time
+        ),
+      ),
+    );
+    startID++;
+
+    //test
+    doses.add(
+      Dose(
+        startID,
+        65,
+        DateTime(
+          2020,
+          4, //month
+          12, //day
+          9, //time
+        ),
+      ),
+    );
+    startID++;
+
+    //test
+    doses.add(
+      Dose(
+        startID,
+        55,
+        DateTime(
+          2020,
+          4, //month
+          14, //day
+          12, //time
+        ),
+      ),
+    );
+    startID++;
     
     //construct the medicine
     //so we can then pass it as if we had read it in
     //and if doing so would let us update things as needed
     AMedication medication = AMedication(
-      "Fluvoxamine", 
+      "Fluvonimax", 
       doses.last.timeStamp, 
       //between 36 and 60 hours
       Duration(hours: 48),

@@ -39,7 +39,7 @@ class HeaderSliver extends StatefulWidget {
 class _HeaderSliverState extends State<HeaderSliver> {
   //eventually object updaters
   final TextEditingController textCtrl =
-      new TextEditingController(text: "Fluvoxamine");
+      new TextEditingController(text: "Fluvonimax");
 
   //build
   @override

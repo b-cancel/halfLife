@@ -28,11 +28,13 @@ Future<DateTime> selectTimeDate(BuildContext context, DateTime initialDate) asyn
     //banner color
     primaryColor: ThemeData.dark().scaffoldBackgroundColor,
     //color of text inside circle highlight
+    /*
     accentTextTheme: TextTheme(
       bodyText1: TextStyle(
         color: ThemeData.dark().scaffoldBackgroundColor,
       ),
     ),
+    */
   );
 
   //updated by everything down the chain

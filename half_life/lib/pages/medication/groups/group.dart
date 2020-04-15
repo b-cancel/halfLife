@@ -62,6 +62,8 @@ class DoseGroup extends StatelessWidget {
       sliver: SliverAnimatedList(
         initialItemCount: group.length,
         itemBuilder: (BuildContext context, int index, anim) {
+          bool isLast = index == (group.length - 1);
+
           //ease access vars
           Dose thisDose = group[index];
           int doseID = thisDose.id;
@@ -76,41 +78,47 @@ class DoseGroup extends StatelessWidget {
               relativeOffset: .5,
             ),
             secondaryVillainAnimation: VillainAnimation.fade(),
-            child: Stack(
-              children: <Widget>[
-                //for absolute last group
-                //the corner that are uncovered should match the filler sliver
-                Positioned.fill(
-                  child: Column(
-                    children: [
-                      //the top part of perhaps just ONE doseage
-                      Expanded(child: Container()),
-                      Expanded(
-                        child: Container(
-                          color: lastGroup
-                              ? ThemeData.dark().scaffoldBackgroundColor
-                              : Colors.transparent,
+            child: ClipRRect(
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(isLast ? 24 : 0),
+                bottomRight: Radius.circular(isLast ? 24 : 0),
+              ),
+              child: Stack(
+                children: <Widget>[
+                  //for absolute last group
+                  //the corner that are uncovered should match the filler sliver
+                  Positioned.fill(
+                    child: Column(
+                      children: [
+                        //the top part of perhaps just ONE doseage
+                        Expanded(child: Container()),
+                        Expanded(
+                          child: Container(
+                            color: lastGroup
+                                ? ThemeData.dark().scaffoldBackgroundColor
+                                : Colors.transparent,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                //the tile
-                DoseTile(
-                  id: doseID,
-                  isFirst: index == 0,
-                  isLast: index == group.length - 1,
-                  isEven: index % 2 == 0,
-                  softHeaderColor: Theme.of(context).accentColor,
-                  dose: thisDose.value,
-                  activeDose: doseIDtoActiveDoseVN.value[doseID],
-                  timeTaken: timeTaken,
-                  timeSinceTaken: lastDateTime.value.difference(timeTaken),
-                  theSelectedDateTime: theSelectedDateTime,
-                  autoScrollController: autoScrollController,
-                  othersCloseOnToggle: otherCloseOnToggle,
-                ),
-              ],
+                  //the tile
+                  DoseTile(
+                    id: doseID,
+                    isFirst: index == 0,
+                    isLast: index == group.length - 1,
+                    isEven: index % 2 == 0,
+                    softHeaderColor: Theme.of(context).accentColor,
+                    dose: thisDose.value,
+                    activeDose: doseIDtoActiveDoseVN.value[doseID],
+                    timeTaken: timeTaken,
+                    timeSinceTaken: lastDateTime.value.difference(timeTaken),
+                    theSelectedDateTime: theSelectedDateTime,
+                    autoScrollController: autoScrollController,
+                    othersCloseOnToggle: otherCloseOnToggle,
+                  ),
+                ],
+              ),
             ),
           );
         },

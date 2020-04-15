@@ -143,7 +143,6 @@ class ToTimeOfDay extends StatelessWidget {
     //return icon
     return IconButton(
       padding: EdgeInsets.all(0),
-      visualDensity: VisualDensity.compact,
       onPressed: () {
         BotToast.showAttachedWidget(
           targetContext: context,

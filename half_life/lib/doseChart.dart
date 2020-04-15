@@ -77,7 +77,7 @@ class _HeaderChartState extends State<HeaderChart> {
 
   //we don't care about all the doses that all together
   //at the moment are contributing to less than 1 of our dosage
-  double maxIrelevantDose = 1;
+  double maxIrelevantDose = 0; //TODO: set this accordingly when the time comes
   int getFirstDoseWeCareAbout(
     DateTime firstTaken,
     DateTime lastDate,
@@ -259,12 +259,13 @@ class _HeaderChartState extends State<HeaderChart> {
               changedListener: (charts.SelectionModel model) {
                 final selectedDatum = model.selectedDatum;
                 if (selectedDatum.isNotEmpty) {
-                  DateTime thisDateTime = selectedDatum.first.datum.dateTime;
+                  DateTime thisDateTime = selectedDatum.first.datum.timeStamp;
                   double activeDosage = selectedDatum.first.datum.value;
                   //set to the selected point
                   selectedDateTime.value = thisDateTime;
                   selectedActiveDosage.value = activeDosage;
-                } else {
+                }
+                else {
                   //set to last point
                   selectedDateTime.value = widget.lastDateTime.value;
                   selectedActiveDosage.value = lastActiveDosage;
